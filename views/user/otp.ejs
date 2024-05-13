@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>OTP Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="text-center">Enter OTP</h4>
+          </div>
+          <div class="card-body">
+            <form action="/verify" method="post">
+              <div class="form-group">
+                <label for="otpInput">OTP:</label>
+                <input type="text" class="form-control" name="otp" id="otpInput" maxlength="4" required>
+              </div>
+              <div class="form-group">
+                <p id="timer">Time remaining: <span id="countdown">60</span> seconds</p>
+              </div>
+              <div class="form-group">
+                <button type="button" class="btn btn-primary" id="resendBtn" onclick="combinfunction()" disabled>Resend
+                  OTP</button>
+              </div>
+              <button type="submit" class="btn btn-success btn-block">Verify OTP</button>
+
+
+              <% if (typeof message!='undefined' ) { %>
+                <div>
+                  <script>
+                    // Show a basic SweetAlert2 message
+                    Swal.fire("Invalid OTP");
+                  </script>
+                </div>
+                <% } %>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- Bootstrap JS and jQuery -->
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <!-- Timer script -->
+  <script>
+    var countdown = 60;
+    var timer = null;
+
+    function startTimer() {
+      timer = setInterval(function () {
+        countdown--;
+        document.getElementById('countdown').innerHTML = countdown;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          document.getElementById('timer').innerHTML = "Time expired. Resend OTP.";
+          document.getElementById('resendBtn').disabled = false; // Enable the resend button
+        }
+      }, 1000);
+    }
+    startTimer();
+
+    function combinfunction() {
+      resendOTP();
+      sendPostRequest();
+    }
+
+    function resendOTP() {
+      // Add logic to resend OTP, for now, reset the timer
+      countdown = 60;
+      document.getElementById('timer').innerHTML = "OTP resent. Time remaining: <span id='countdown'>60</span> seconds";
+      startTimer();
+      document.getElementById('resendBtn').disabled = true; // Disable the resend button again
+    }
+
+    function sendPostRequest() {
+      const url = '/resend'; // Replace with your actual backend endpoint
+
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Response:', data);
+          // Handle the response as needed
+        })
+        .catch(error => {
+          console.error('Error:', error.message);
+        });
+    }
+  </script>
+
+
+</body>
+
+</html>

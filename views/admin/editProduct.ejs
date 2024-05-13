@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Form</title>
+    <!-- Include Bootstrap for styling and jQuery for easier DOM manipulation -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+</head>
+
+<body style="background: rgb(81, 79, 79);">
+    <div class="container bg-white  w-50 rounded rounded-4">
+        <h2>Product Form</h2>
+        <% if(typeof sendToEdit !='undefined' ) { %>
+        <form action="/admin/edit_product/<%=sendToEdit._id %>" method="POST" id="productForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" value="<%= sendToEdit.name %>" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select class="form-control" id="category" name="category">
+                    <option value="<%= sendToEdit.category._id %>"><%= sendToEdit.category.name %></option>
+                    <% categories.forEach(element=> { %>
+                    <option value="<%= element._id %>">
+                        <%= element.name %>
+                    </option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="number" value="<%= sendToEdit.price %>" class="form-control" id="price" name="price">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" value="<%= sendToEdit.quantity %>" class="form-control" id="quantity" name="quantity">
+            </div>
+            <div class="form-group">
+                <label for="images">Images:</label>
+                <input class="btn border rounded " type="file" class="form-control" id="images" name="images[]" multiple>
+            </div>
+            <!-- <div class="col-12">
+                <label for="images" class="form-label">Images (Max 4, crop and resize):</label>
+                <div id="imageUpload" class="dropzone"></div>
+                <div id="imagePreview" class="mt-3"></div>
+                <input type="hidden" value="<%= sendToEdit._id %>" id="croppedImages" name="croppedImages">
+            </div> -->
+            <div class="form-group">
+                <label for="existingImages">Existing Images:</label>
+                <div id="existingImages">
+                    <% if(sendToEdit.images && sendToEdit.images.length > 0) { %>
+                        <% sendToEdit.images.forEach(image => { %>
+                            <img src="<%= image.url%>" class="img-thumbnail mr-2 mb-2" alt="Existing Image">
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="3"><%= sendToEdit.description %></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <% } %>
+    </div>
+    <!-- Include a JavaScript file for client-side validation and image handling -->
+    <script src="formValidation.js"></script>
+    <!-- Include the Croppie library -->
+    <script src="path/to/croppie.js"></script>
+    <script>
+        var croppies = []; // Array to store Croppie instances
+
+        // Handle image selection for cropping
+        document.getElementById('images').addEventListener('change', function (event) {
+            var files = event.target.files;
+            var imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = ''; // Clear previous image previews
+
+            // Create a Croppie instance for each selected image
+            for (var i = 0; i < files.length; i++) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('img-thumbnail', 'mr-2', 'mb-2');
+                    imagePreview.appendChild(img);
+
+                    // Create a new Croppie instance for this image
+                    var croppie = new Croppie(img, {
+                        viewport: { width: 200, height: 200 },
+                        boundary: { width: 300, height: 300 },
+                        showZoomer: true
+                    });
+                    croppies.push(croppie); // Add Croppie instance to the array
+                };
+                reader.onerror = function (error) {
+                    console.error('Error reading the file:', error);
+                };
+                reader.readAsDataURL(files[i]);
+            }
+
+            // Check if more than 4 images are selected
+            if (files.length > 4) {
+                alert('You can only select up to 4 images.');
+                this.value = ''; // Clear the file input
+            }
+        });
+
+        // Event listener for form submission
+        document.getElementById('productForm').addEventListener('submit', function (event) {
+            var files = document.getElementById('images').files;
+            if (files.length < 3) {
+                alert('Please select at least three images.');
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+
+        // Function to validate form inputs
+        function validateForm() {
+            var name = document.getElementById('name').value.trim();
+            var category = document.getElementById('category').value.trim();
+            var price = document.getElementById('price').value.trim();
+            var quantity = document.getElementById('quantity').value.trim();
+            var images = document.getElementById('images').files;
+            var description = document.getElementById('description').value.trim();
+
+            if (name === '' || category === '' || price === '' || quantity === '' || images.length === 0 || description === '') {
+                alert('Please fill in all fields.');
+                return false; // Prevent form submission
+            }
+
+            if (images.length > 4) {
+                alert('You can only select up to 4 images.');
+                return false; // Prevent form submission
+            }
+
+            // Additional validation logic can be added here if needed
+
+            return true; // Allow form submission
+        }
+
+        // Event listener for form submission
+        document.getElementById('productForm').addEventListener('submit', function (event) {
+            if (!validateForm()) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+    </script>
+</body>
+
+
+</html>
