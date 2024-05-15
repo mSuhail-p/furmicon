@@ -139,7 +139,7 @@ const insertUser = async (req, res) => {
     try {
 
         // console.log(req.body.username+"it is user name")
-         
+
 
         const is_already = await User.findOne({ email: req.body.email })
 
@@ -158,39 +158,39 @@ const insertUser = async (req, res) => {
 
 
 
-                const user = new User({
+            const user = new User({
 
-                    username: req.body.name,
-                    email: req.body.email,
-                    mobile: req.body.mobile,
-                    password: spassword,
-                    is_admin: 0,
-
-
-                })
+                username: req.body.name,
+                email: req.body.email,
+                mobile: req.body.mobile,
+                password: spassword,
+                is_admin: 0,
 
 
-
-                const userdata = await user.save();
-                if (userdata) {
-
-                    const otpGenerate = generateOTP();
-
-                    req.session.otp = otpGenerate
-
-                    saveOtp(req.body.email, otpGenerate)
-                    req.session.email = req.body.email
+            })
 
 
-                    sendVerifyMail(req.body.name, req.body.email, userdata._id, otpGenerate)
 
-                    res.render('user/otp.ejs')
-                    //     res.render('user/home')
-                    // }else{
-                    //     res.render('user/login', {message:'Failed'})
-                    // }
+            const userdata = await user.save();
+            if (userdata) {
 
-                }
+                const otpGenerate = generateOTP();
+
+                req.session.otp = otpGenerate
+
+                saveOtp(req.body.email, otpGenerate)
+                req.session.email = req.body.email
+
+
+                sendVerifyMail(req.body.name, req.body.email, userdata._id, otpGenerate)
+
+                res.render('user/otp.ejs')
+                //     res.render('user/home')
+                // }else{
+                //     res.render('user/login', {message:'Failed'})
+                // }
+
+            }
 
 
             // } else {
@@ -217,7 +217,7 @@ const verifiedLogin = async (req, res) => {
         // console.log(req.body.email, req.body.password + "data is coming")
 
         const userdata = await User.findOne({ email: email })
-        console.log(userdata+"it is userdata");
+        console.log(userdata + "it is userdata");
 
 
         if (userdata != null) {
@@ -299,7 +299,7 @@ const loadHome = async (req, res) => {
 
 
 
-const loadsignup= async (req, res) => {
+const loadsignup = async (req, res) => {
     try {
         if (req.session.user_id) {
 
@@ -318,7 +318,7 @@ const loadsignup= async (req, res) => {
 
 
 
-const loadLogin= async (req, res) => {
+const loadLogin = async (req, res) => {
     try {
         if (req.session.user_id) {
 
@@ -499,7 +499,7 @@ const googleAuth = async (req, res) => {
                 username: req.user.name.givenName,
                 email: req.user.email,
                 googleId: req.user.id,
-                is_verified:1
+                is_verified: 1
             })
 
             let googledoc = await googleRegister.save()
@@ -519,15 +519,70 @@ const googleAuth = async (req, res) => {
 }
 
 
-let viewWishlist = async (req,res)=>{
- try{
+let viewWishlist = async (req, res) => {
+    try {
 
-    res.render('user/wishlist')
+        res.render('user/wishlist')
 
 
- }catch(error){
-    console.log(error)
- }
+    } catch (error) {
+        console.log('error rendering wishlist:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the wishlist.' });
+    }
+}
+
+
+let userProfile = async (req, res) => {
+
+    try {
+
+        let userId = req.session.user_id;
+
+        let userDocument = await User.findOne({ _id: userId })
+
+        res.render('user/userProfile', { userDocument })
+
+    } catch (error) {
+
+        console.log('error rendering userProfile:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the wishlist.' })
+    }
+
+}
+
+
+let editProfile = async (req, res) => {
+
+    try {
+        console.log("staring")
+        let userId = req.session.user_id
+        let formData = req.body
+        console.log(formData.name)
+        console.log(formData.email)
+        console.log(formData.mobile)
+
+        let userDocument = await User.updateOne({ _id: userId }, {
+            $set: {
+
+                username: formData.name,
+
+                email: formData.email,
+                mobile: formData.mobile
+
+            }
+        }, { upsert: true })
+
+        console.log(userDocument, "it is updtaed thing")
+        res.json({status:true})
+
+
+
+    } catch (error) {
+
+        console.log('error rendering userProfile:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the wishlist.' })
+    }
+
 }
 
 
@@ -551,7 +606,9 @@ module.exports = {
     // beforLogin
     productDetails,
     googleAuth,
-    viewWishlist
+    viewWishlist,
+    userProfile,
+    editProfile
 
 
 } 

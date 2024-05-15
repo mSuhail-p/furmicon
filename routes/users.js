@@ -59,6 +59,12 @@ router.get('/addToCart/:productId/:quantity',auth.cart,cartController.addToCart)
 router.patch('/removeCart/:productId',cartController.removeCart)
 
 
+
+//userProfile
+router.get('/userProfile',userController.userProfile)
+router.post('/editProfile',userController.editProfile)
+
+
 //wihslist
 router.get('/wishlist',userController.viewWishlist)
 

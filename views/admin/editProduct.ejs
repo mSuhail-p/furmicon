@@ -56,7 +56,9 @@
                 <div id="existingImages">
                     <% if(sendToEdit.images && sendToEdit.images.length > 0) { %>
                         <% sendToEdit.images.forEach(image => { %>
-                            <img src="<%= image.url%>" class="img-thumbnail mr-2 mb-2" alt="Existing Image">
+                        <div class="w-25 d-flex flex-row  bd-highlight mb-3 flex-row ">
+                            <img class="img-fluid" src="/userimages/<%= image%>" class="img-thumbnail mr-2 mb-2" alt="Existing Image">
+                        </div>
                         <% }); %>
                     <% } %>
                 </div>

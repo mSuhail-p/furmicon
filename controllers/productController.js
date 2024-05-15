@@ -69,7 +69,7 @@ const loadproduct = async (req, res) => {
         const liproduct = await Product.find({}).populate('category')
 
         if (liproduct) {
-            console.log(liproduct[0].category + "categoryyyyyyyyyyyyyyyyyy")
+            // console.log(liproduct[0].category + "categoryyyyyyyyyyyyyyyyyy")
 
             res.render('admin/product_list', { liproduct });
 
@@ -141,7 +141,9 @@ const edit_product = async (req, res) => {
 
         // const {name,category,quantity,price,description}=req.body
         let productId = req.params.productId
-
+        console.log(req.body.images + 'imagessssss')
+        console.log(req.body.price + 'priceeeeeeeeeee') 
+        
         const images = req.files.map(file => file.filename);
         const proData = await Product.findOneAndUpdate({ _id: productId }, {
             name: req.body.name,
