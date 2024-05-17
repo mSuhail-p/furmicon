@@ -61,8 +61,13 @@ router.patch('/removeCart/:productId',cartController.removeCart)
 
 
 //userProfile
-router.get('/userProfile',userController.userProfile)
+router.get('/userProfile',auth.authenticate,userController.userProfile)
 router.post('/editProfile',userController.editProfile)
+router.get('/userAddress',userController.addressLoad)
+router.post('/addAddress',userController.addAddress)
+router.get('/changePassword',userController.changePassword)
+router.post('/changePassword',userController.changinPassword)
+ 
 
 
 //wihslist

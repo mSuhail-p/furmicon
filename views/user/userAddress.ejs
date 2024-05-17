@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #333;
+            color: #fff;
+            padding: 2rem;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .sidebar-nav {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #444;
+        }
+
+        .sidebar-nav a.active {
+            background-color: #007bff;
+        }
+
+        .sidebar-nav a i {
+            margin-right: 0.5rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 2rem;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <style>
+        .navbar-nav .nav-item+.nav-item {
+            margin-left: 20px;
+            /* Adjust the value as needed */
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <h4>Menu</h4>
+                <ul class="sidebar-nav">
+                    <li><a href="/userProfile"><i class="fas fa-user"></i>Profile</a></li>
+                    <li><a href="/userAddress" class="active "><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                    <li><a href="orders.html"><i class="fas fa-shopping-cart"></i>Orders</a></li>
+                    <li><a href="/changePassword"><i class="fas fa-key"></i>Change Password</a></li>
+                    <li><a href="sign-out.html"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                </ul>
+            </div>
+
+
+            <style>
+                .borderCreate {
+                    border: 1px solid #000;
+                    border-radius: 20px;
+                    border-color: rgb(0, 0, 0);
+                    border-width: 2px;
+                    height: 540px;
+                    overflow-y: scroll;
+
+                }
+            </style>
+
+            <div class=" borderCreate col-md-8 accordion  ">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active " id="tab-dashboard" role="tabpanel"
+                        aria-labelledby="tab-dashboard-link">
+                        <div class="container-fluid  my-5">
+
+                            <div class="row justify-content-end">
+
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                    data-target="#addressModal">
+                                    Add Address
+                                </button>
+                            </div>
+
+                            <div class="text-center ">
+
+                                <h2>ADDRESS</h2>
+                            </div>
+
+                            <% allAddresses.forEach((address)=>{ %>
+
+
+
+                                <style>
+                                    .user-info {
+                                        background-color: #ffff;
+                                        border-radius: 5px;
+                                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                        padding: 1.5rem;
+                                        max-width: 500px;
+                                        margin: 0 auto;
+                                    }
+
+                                    .user-info .row {
+                                        margin-bottom: 0.75rem;
+                                        display: flex;
+                                        align-items: center;
+                                    }
+
+                                    .user-info .row:last-child {
+                                        margin-bottom: 0;
+                                    }
+
+                                    .user-info .label {
+                                        font-weight: bold;
+                                        margin-right: 1rem;
+                                        flex: 0 0 30%;
+                                        max-width: 30%;
+                                    }
+
+                                    .user-info .value {
+                                        flex: 0 0 70%;
+                                        max-width: 70%;
+                                    }
+
+                                    .user-info .actions {
+                                        text-align: right;
+                                    }
+
+                                    .user-info .actions .btn {
+                                        margin-left: 0.5rem;
+                                    }
+                                </style>
+
+                                <div class="user-info w-50 ">
+                                    <div class="row  ">
+                                        <div class="cal col-md-6">First Name:</div>
+                                        <div class="cal col-md-6">
+                                            <%= address.firstName %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Last Name:</div>
+                                        <div class="cal col-md-6">
+                                            <%= address.lastName %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Country:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.country %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Street:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.streetName %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Town:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.town %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">State:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.state %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Postcode:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.postCode %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Phone:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.phone %>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cal col-md-6">Email:</div>
+                                        <div class="cal col-md-6">
+                                            <%=address.email %>
+                                        </div>
+                                    </div>
+                                    <div class="row actions">
+                                        <div class="">
+                                            <button class="btn btn-primary">Edit</button>
+                                            <button class="btn btn-danger">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <% }) %>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+
+
+            <!-- MODAL  -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/addAddress" method="post">
+                                <div class="form-group">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" name="fname" class="form-control" id="firstName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" name="lname" class="form-control" id="lastName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="country">Country</label>
+                                    <select name="country" class="form-control" id="country">
+                                        <option value="">Select Country</option>
+                                        <option value="Afghanistan">Afghanistan</option>
+                                        <option value="Argentina">Argentina</option>
+                                        <option value="Australia">Australia</option>
+                                        <option value="Brazil">Brazil</option>
+                                        <option value="Canada">Canada</option>
+                                        <option value="China">China</option>
+                                        <option value="France">France</option>
+                                        <option value="Germany">Germany</option>
+                                        <option value="India">India</option>
+                                        <option value="Indonesia">Indonesia</option>
+                                        <option value="Italy">Italy</option>
+                                        <option value="Japan">Japan</option>
+                                        <option value="Mexico">Mexico</option>
+                                        <option value="Nigeria">Nigeria</option>
+                                        <option value="Pakistan">Pakistan</option>
+                                        <option value="Russia">Russia</option>
+                                        <option value="Saudi Arabia">Saudi Arabia</option>
+                                        <option value="South Africa">South Africa</option>
+                                        <option value="South Korea">South Korea</option>
+                                        <option value="Turkey">Turkey</option>
+                                        <option value="United Kingdom">United Kingdom</option>
+                                        <option value="United States">United States</option>
+                                    </select>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="streetName">Street Name</label>
+                                    <input type="text" name="street" class="form-control" id="streetName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="town">Town</label>
+                                    <input type="text" name="town" class="form-control" id="town">
+                                </div>
+                                <div class="form-group">
+                                    <label for="state">State</label>
+                                    <input type="text" name="state" class="form-control" id="state">
+                                </div>
+                                <div class="form-group">
+                                    <label for="postcode">Postcode</label>
+                                    <input type="number" name="pin" class="form-control" id="postcode" pattern="\d{6}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone</label>
+                                    <input type="number" name="mobile" class="form-control" id="phone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" class="form-control" id="email">
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary" id="submitBtn" value="Submit">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+            <!-- /////////////////// -->
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('submitBtn').addEventListener('click', function () {
+                        // Get form values
+                        const name = document.getElementById('name').value.trim();
+                        const email = document.getElementById('email').value.trim();
+                        const phone = document.getElementById('phone').value.trim();
+
+                        // Validate form fields
+                        if (name === '') {
+                            alert('Please enter your name.');
+                            return;
+                        }
+
+                        if (email === '') {
+                            alert('Please enter your email.');
+                            return;
+                        }
+
+                        if (!isValidEmail(email)) {
+                            alert('Please enter a valid email address.');
+                            return;
+                        }
+
+                        if (phone === '') {
+                            alert('Please enter your phone number.');
+                            return;
+                        }
+
+                        if (!isValidPhoneNumber(phone)) {
+                            alert('plers')
+                            return;
+                        }
+
+                    });
+                });
+
+                // Email validation function
+                function isValidEmail(email) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return emailRegex.test(email);
+                }
+
+                // Phone number validation function
+                function isValidPhoneNumber(phone) {
+                    const phoneRegex = /^\d{10}$/; // Assuming a 10-digit phone number
+                    return phoneRegex.test(phone);
+                }
+            </script>
+
+
+
+
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+            <script>
+
+
+
+            </script>
+
+</body>
+
+</html>

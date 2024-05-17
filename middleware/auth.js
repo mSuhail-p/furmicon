@@ -31,7 +31,7 @@ const is_logout = async (req, res, next) => {
         } else {
             res.redirect("/");
         }
- 
+
     } catch (error) {
         console.log(error);
     }
@@ -44,6 +44,25 @@ const cart = async (req, res, next) => {
         if (req.session.a) {
             res.redirect('/admin')
         } else if (req.session.user_id) {
+            next();
+        } else {
+            res.redirect("/login");
+        }
+
+
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+const authenticate = async (req, res, next) => {
+    try {
+        console.log('reached')
+
+        if (req.session.user_id) {
             next();
         } else {
             res.redirect("/login");
@@ -146,6 +165,7 @@ module.exports = {
     isAuthenticated,
     // isAuthenticated,
     is_blocked,
-    cart
+    cart,
+    authenticate
 
 }

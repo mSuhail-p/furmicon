@@ -3,6 +3,7 @@ const User = require('../model/userModel')
 const OTP = require('../model/otp')
 const Product = require('../model/product')
 const bcrypt = require('bcrypt');
+const userAddress = require('../model/Address')
 const nodemailer = require('nodemailer');
 
 
@@ -556,24 +557,25 @@ let editProfile = async (req, res) => {
     try {
         console.log("staring")
         let userId = req.session.user_id
-        let formData = req.body
-        console.log(formData.name)
-        console.log(formData.email)
-        console.log(formData.mobile)
+        let name = req.body.name
+        let email = req.body.email
+        let mobile = req.body.mobile
+        console.log(name + "it is form data")
+        console.log(email + "it is form data")
+        console.log(mobile + "it is form data")
 
         let userDocument = await User.updateOne({ _id: userId }, {
             $set: {
 
-                username: formData.name,
-
-                email: formData.email,
-                mobile: formData.mobile
+                username: name,
+                email: email,
+                mobile: mobile
 
             }
         }, { upsert: true })
 
         console.log(userDocument, "it is updtaed thing")
-        res.json({status:true})
+        res.redirect('/userProfile')
 
 
 
@@ -585,6 +587,113 @@ let editProfile = async (req, res) => {
 
 }
 
+
+let addressLoad = async (req, res) => {
+    try {
+
+        let allAddresses = await userAddress.find({ userId: req.session.user_id })
+        if (allAddresses.length > 0) {
+
+            res.render('user/userAddress', { allAddresses })
+        } else {
+            res.render('user/userAddress')
+        }
+
+    } catch (error) {
+        console.log('error rendering userAddress:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the userAddress.' })
+
+    }
+}
+
+
+
+let addAddress = async (req, res) => {
+    try {
+
+
+
+        let { fname, lname, street, country, state, town, pin, mobile, email } = req.body
+
+        let addToAddress = new userAddress({
+            userId: req.session.user_id,
+            firstName: fname,
+            lastName: lname,
+            country: country,
+            streetName: street,
+            town: town,
+            state: state,
+            postCode: pin,
+            phone: mobile,
+            email: email
+
+
+        })
+
+        let storedAddress = await addToAddress.save()
+        console.log(storedAddress, "it is storing")
+
+        res.render('user/userAddress')
+
+
+
+    } catch (error) {
+        console.log('error rendering userAddress:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the userAddress.' })
+
+    }
+}
+
+
+
+let changePassword = async (req, res) => {
+    try {
+
+        res.render('user/changePassword')
+
+
+    } catch (error) {
+        console.log('error rendering ChangePassword:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the userAddress' })
+    }
+}
+
+let changinPassword = async (req, res) => {
+    try {
+        console.log("changin paassword")
+        let currentPassword = req.body.currentPass
+        let newPassword = req.body.newPass
+        let confirmPassword = req.body.confirmpass
+        let userDetails = await User.findOne({ _id: req.session.user_id });
+        if (userDetails.password) {
+
+            const passwordMatch = await bcrypt.compare(currentPassword, userDetails.password)
+            if (passwordMatch) {
+                if (newPassword === confirmPassword) {
+                    let encripted = await securePassword(newPassword)
+                    console.log(encripted, "it is encripted")
+                    let updatingPassword = await User.updateOne({ _id: req.session.user_id }, { $set: { password: encripted } })
+                    console.log(updatingPassword)
+                    res.render('user/changePassword')
+                }
+
+            }
+
+
+        } else {    
+            res.render('user/changePassword', { message: 'you are logined with google' })
+        }
+
+
+
+
+
+
+    } catch (error) {
+        console.log('error rendering ChangePassword:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the userAddress' })
+    }
+}
 
 
 
@@ -608,7 +717,12 @@ module.exports = {
     googleAuth,
     viewWishlist,
     userProfile,
-    editProfile
+    editProfile,
+    addressLoad,
+    addAddress,
+    changePassword,
+    changinPassword
+
 
 
 } 
