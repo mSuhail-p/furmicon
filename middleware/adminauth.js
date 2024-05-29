@@ -8,9 +8,9 @@ const is_login = async (req, res, next) => {
             next()
 
         } else {
-            // res.redirect("/admin");
-            next()
-            
+            res.redirect("/admin");
+            // next()
+
         }
 
 
@@ -20,7 +20,7 @@ const is_login = async (req, res, next) => {
     }
 }
 
-module.exports ={
+module.exports = {
     is_login
 
 }

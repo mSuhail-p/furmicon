@@ -138,30 +138,35 @@ const editProductLoad = async (req, res) => {
 
 const edit_product = async (req, res) => {
     try {
+        const { productId } = req.params;
+        const { name, category, price, quantity, description, existingImages } = req.body;
 
-        // const {name,category,quantity,price,description}=req.body
-        let productId = req.params.productId
-        console.log(req.body.images + 'imagessssss')
-        console.log(req.body.price + 'priceeeeeeeeeee') 
-        
-        const images = req.files.map(file => file.filename);
+        // Extract existing images from the request body
+        let images = existingImages || [];
+
+        // Append new uploaded images to the list
+        if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+                images.push(file.filename);
+            });
+        }
+
+        // Update the product with the merged list of images
         const proData = await Product.findOneAndUpdate({ _id: productId }, {
-            name: req.body.name,
-            category: req.body.category,
-            price: req.body.price,
-            quantity: req.body.quantity,
-            images: images,
-            description: req.body.description
-        })
+            name,
+            category,
+            price,
+            quantity,
+            images,
+            description
+        }, { new: true });
 
-
-        // await proData.save();
-        res.redirect('/admin/product')
-
+        res.status(200).send({ message: 'Product updated successfully!', product: proData });
     } catch (error) {
-        console.log(error)
+        res.status(500).send({ message: 'Error updating product', error });
     }
-}
+};
+
 
 
 

@@ -21,20 +21,17 @@ let Cart = require('../model/Cart');
 const addToCart = async (req, res) => {
     try {
 
+        console.log("it is add to cart")
+
 
         let isNewCart = await Cart.find({ userId: req.session.user_id })
         if (isNewCart && isNewCart.length > 0) {
-            //if here is already that productId , quantity should be increased
-            let existingProduct = await Cart.findOne({ Products: { $elemMatch: { productId: req.params.productId } } })
+
+            let existingProduct = await Cart.findOne({ $and: [{ Products: { $elemMatch: { productId: req.params.productId } } }, { userId: req.session.user_id }] })
             if (existingProduct) {
 
-                ///////////////////////////////////////////////////
-                let quantityIncrement = await Cart.updateOne(
-                    { 'Products.productId': productId }, // Query condition to find the document with the specified productId within the products array
-                    { $inc: { 'Products.$.quantity': 1 } } // Use $inc operator to increment the quantity field of the matching product
-                )
-                console.log(quantityIncrement + "it is quanity increment")
-                //////////////////////////////////////////////////////////////////
+                res.json({ message: false })
+
             } else {
 
                 const cart = await Cart.findOne({ userId: req.session.user_id });
@@ -69,39 +66,63 @@ const addToCart = async (req, res) => {
 }
 
 
-let viewCart = async (req, res) => {
+const viewCart = async (req, res) => {
 
     try {
 
-        let displayCart = await Cart.findOne({ userId: req.session.user_id }).populate('userId').populate({path: 'Products',
-            populate: { path: 'productId' }})
+        let displayCart = await Cart.find({ userId: req.session.user_id }).populate('userId').populate({
+            path: 'Products',
+            populate: { path: 'productId' }
+        })
 
+        console.log(displayCart, 'it is displayCart')
 
-        console.log(displayCart.Products[0].productId.name)
+        // console.log(displayCart[0].Products[0].productId.images, 'it is images')
         res.render('user/cart', { displayCart })
-    } catch (error) {   
+    } catch (error) {
         console.log(error)
     }
 
 
 }
 
-let removeCart = async(req,res)=>{
+const removeCart = async (req, res) => {
     try {
 
         let productId = req.params.productId
-        let update =await Cart.updateOne(
+        await Cart.updateOne(
             { 'Products.productId': productId },
             { $pull: { 'Products': { 'productId': productId } } }
         );
-        
-        
-        
-        console.log(update +"finished")
 
-        console.log(productId+"reached at remove")
+        res.json({ message: 'removed' })
 
-    }catch(error){
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+const productQuantity = async (req, res) => {
+    try {
+        const { currentQuantity, productId } = req.body
+        const { user_id } = req.session
+
+        console.log(currentQuantity, productId)
+        const edited = await Cart.updateOne(
+            { "Products._id": productId },
+            { $set: { "Products.$.quantity": currentQuantity } }
+        )
+        const cartDocument = await Cart.findOne({ userId: user_id }).populate('userId').populate({
+            path: 'Products',
+            populate: { path: 'productId' }
+        })
+        res.json({ cartDocument })
+
+
+
+    } catch (error) {
         console.log(error)
     }
 }
@@ -112,7 +133,9 @@ let removeCart = async(req,res)=>{
 module.exports = {
     viewCart,
     addToCart,
-    removeCart
+    removeCart,
+    productQuantity,
+
 
 
 }

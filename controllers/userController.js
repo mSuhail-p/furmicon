@@ -2,9 +2,12 @@ const mongoose = require('mongoose')
 const User = require('../model/userModel')
 const OTP = require('../model/otp')
 const Product = require('../model/product')
-const bcrypt = require('bcrypt');
+const Orders = require('../model/order')
+const Category = require('../model/category')
 const userAddress = require('../model/Address')
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+
 
 
 
@@ -271,19 +274,46 @@ const verifiedLogin = async (req, res) => {
 const loadHome = async (req, res) => {
     try {
         const product = await Product.find({}).populate('category')
+        const category = await Category.find({})
 
         if (req.session.user_id) {
-
-            console.log("first")
-            res.render('user/home', { product })
+            const { user_id } = req.session
+            res.render('user/home', { product, user_id, category })
 
         } else {
-            console.log("second")
-            res.render('user/home', { product })
+
+            res.render('user/home', { product, category })
         }
 
     } catch (error) {
         console.log(error)
+    }
+}
+
+
+
+
+const categorySorting = async (req, res) => {
+    try {
+        const { categoryId } = req.params
+        console.log(categoryId)
+        console.log("it is category sorting")
+        // const product
+        const product = await Product.find({ category: categoryId }).populate('category')
+        console.log(product);
+        const category = await Category.find({})
+
+        if (req.session.user_id) {
+            const { user_id } = req.session
+            res.render('user/home', { product, user_id, category })
+
+        } else {
+
+            res.render('user/home', { product, category })
+        }
+
+    } catch (error) {
+        console.log('it is error for rendering categorySorting:', error)
     }
 }
 
@@ -369,21 +399,28 @@ const verifyMail = async (req, res) => {
 
 
         const otpverify = await OTP.findOne({ email: req.session.email });
+        console.log(otpverify, 'it is otpverify')
 
-        console.log("it is second" + otpverify.otp);
-        console.log("it is third" + req.body.otp);
+        // console.log("it is second" + otpverify.otp);
+        // console.log("it is third" + req.body.otp);
+        if (otpverify != null) {
 
+            if (otpverify.otp == req.body.otp) {
+                const updateInfo = await User.updateOne({ email: req.session.email }, { $set: { is_verified: 1 } })
+                if (updateInfo) {
+                    //user has to login for enter to home  page
+                    res.render('user/login.ejs', { afterOtp: 'Please Login' })
+                }
+            } else {
+                const message = "Invalid otp, please check"
+                res.render('user/otp', { message })
 
-        if (otpverify.otp == req.body.otp) {
-            const updateInfo = await User.updateOne({ email: req.session.email }, { $set: { is_verified: 1 } })
-            if (updateInfo) {
-                //user has to login for enter to home  page
-                res.render('user/login.ejs', { afterOtp: 'Please Login' })
             }
-        } else {
-            const message = "Invalid otp, please check"
-            res.render('user/otp', { message })
 
+        } else {
+            console.log("here is reached")
+            const expires = 'In valid otp, please check'
+            res.render('user/otp', { expires })
         }
 
         // console.log(req.session.user_id)
@@ -442,6 +479,62 @@ const shopProduct = async (req, res) => {
 }
 
 
+const sortProduct = async (req, res) => {
+    try {
+        let method = req.params.method
+        console.log(method, 'it is inside the metho')
+
+
+        if (method == 'LowToHigh') {
+            let ascending = await Product.find({}).sort({ price: 1 }).populate('category')
+            console.log(ascending, 'it is also insidle the sorring')
+            const products = ascending.filter((element) => {
+                return element.category.status === true && element.is_blocked === 1;
+            })
+            res.render('user/shop', { products })
+        } else if (method == 'HighToLow') {
+
+            let ascending = await Product.find({}).sort({ price: -1 }).populate('category')
+            console.log(ascending, 'it is also insidle the sorring')
+            const products = ascending.filter((element) => {
+                return element.category.status === true && element.is_blocked === 1;
+            })
+            res.render('user/shop', { products })
+
+        } else if (method == 'A-Z') {
+
+            let ascending = await Product.find({}).sort({ name: 1 }).populate('category')
+            console.log(ascending, 'it is also insidle the sorring')
+            const products = ascending.filter((element) => {
+                return element.category.status === true && element.is_blocked === 1;
+            })
+            res.render('user/shop', { products })
+
+        } else if (method == 'Z-A') {
+
+            let ascending = await Product.find({}).sort({ name: -1 }).populate('category')
+            console.log(ascending, 'it is also insidle the sorring')
+            const products = ascending.filter((element) => {
+                return element.category.status === true && element.is_blocked === 1;
+            })
+            res.render('user/shop', { products })
+
+        }
+
+
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+
+
+
+
+
+
 const productDetails = async (req, res) => {
     try {
 
@@ -451,14 +544,14 @@ const productDetails = async (req, res) => {
         console.log(product_id + "is product id ")
 
 
-
+        let UserId = req.session.user_id
         const product = await Product.findOne({ _id: product_id }).populate('category');
         const related = await Product.find({ category: product.category._id }).populate('category')
         console.log("..........." + related + "it is related ")
 
         console.log(product.images[1] + "it is images");
 
-        res.render('user/product', { product, related })
+        res.render('user/product', { product, related, UserId })
 
 
 
@@ -592,10 +685,12 @@ let addressLoad = async (req, res) => {
     try {
 
         let allAddresses = await userAddress.find({ userId: req.session.user_id })
-        if (allAddresses.length > 0) {
 
+        if (allAddresses.length > 0) {
             res.render('user/userAddress', { allAddresses })
+
         } else {
+
             res.render('user/userAddress')
         }
 
@@ -611,9 +706,10 @@ let addressLoad = async (req, res) => {
 let addAddress = async (req, res) => {
     try {
 
-
+        console.log('it is add address')
 
         let { fname, lname, street, country, state, town, pin, mobile, email } = req.body
+        console.log(req.body, 'is req.body')
 
         let addToAddress = new userAddress({
             userId: req.session.user_id,
@@ -631,9 +727,9 @@ let addAddress = async (req, res) => {
         })
 
         let storedAddress = await addToAddress.save()
-        console.log(storedAddress, "it is storing")
 
-        res.render('user/userAddress')
+
+        res.redirect('/userAddress')
 
 
 
@@ -660,40 +756,206 @@ let changePassword = async (req, res) => {
 
 let changinPassword = async (req, res) => {
     try {
-        console.log("changin paassword")
-        let currentPassword = req.body.currentPass
-        let newPassword = req.body.newPass
-        let confirmPassword = req.body.confirmpass
+        console.log("changin paassword");
+        let currentPassword = req.body.currentPass;
+        let newPassword = req.body.newPass;
+        let confirmPassword = req.body.confirmpass;
         let userDetails = await User.findOne({ _id: req.session.user_id });
-        if (userDetails.password) {
 
-            const passwordMatch = await bcrypt.compare(currentPassword, userDetails.password)
+        if (userDetails.password) {
+            const passwordMatch = await bcrypt.compare(currentPassword, userDetails.password);
             if (passwordMatch) {
+                console.log("it is inside the password match");
                 if (newPassword === confirmPassword) {
-                    let encripted = await securePassword(newPassword)
-                    console.log(encripted, "it is encripted")
-                    let updatingPassword = await User.updateOne({ _id: req.session.user_id }, { $set: { password: encripted } })
-                    console.log(updatingPassword)
-                    res.render('user/changePassword')
+                    let encripted = await securePassword(newPassword);
+                    console.log(encripted, "it is encripted");
+                    let updatingPassword = await User.updateOne({ _id: req.session.user_id }, { $set: { password: encripted } });
+                    console.log(updatingPassword);
+                    res.render('user/changePassword', { success: true });
+                } else {
+                    res.render('user/changePassword', { notConfirm: 'Password Confirmation Failed' });
                 }
+            } else {
+                console.log("else of the current match");
+                res.render('user/changePassword', { wrongPassword: 'The current password you provided does not match our records' });
+            }
+        } else {
+            res.render('user/changePassword', { message: 'You cannot change your password on this website because you are logged in using your Google account' });
+        }
+    } catch (error) {
+        console.log('error rendering ChangePassword:', error);
+        res.status(500).render('error', { error: 'An error occurred while rendering the userAddress' });
+    }
+};
+
+
+
+
+
+
+const getEditAddress = async (req, res) => {
+
+    try {
+
+        const { addressId } = req.params
+        const Address = await userAddress.findOne({ _id: addressId })
+        console.log(Address)
+
+        res.render('user/editAddress', { Address })
+
+
+
+
+    } catch (error) {
+        console.log('error rendering geteditAddress', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the  getEditAddress' })
+
+    }
+}
+
+
+
+
+
+
+const editAddress = async (req, res) => {
+
+    try {
+
+        let { fname, lname, street, country, state, town, pin, mobile, email, id } = req.body
+        const updateAddress = await userAddress.updateOne({ _id: id }, {
+            $set: {
+                firstName: fname,
+                lastName: lname,
+                country: country,
+                streetName: street,
+                town: town,
+                state: state,
+                postCode: pin,
+                pbone: mobile,
+                email: email
 
             }
+        })
+
+        res.redirect('/userAddress')
 
 
-        } else {    
-            res.render('user/changePassword', { message: 'you are logined with google' })
-        }
 
+    } catch (error) {
+        console.log('error rendering editAddress', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the signout' })
+
+    }
+}
+
+
+
+const getOrder = async (req, res) => {
+
+    try {
+
+        const { user_id } = req.session
+        const orders = await Orders.find({ userId: user_id }).populate({
+            path: 'orderedProducts.productId',
+            model: 'Product'
+        }).sort({purchasedDate:-1})
+
+        res.render('user/orderHistory', { orders })
+
+
+
+    } catch (error) {
+        console.log('error rendering getOrder', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the orderpage' })
+
+
+    }
+}
+
+
+
+let cancelOrder = async (req, res) => {
+    try {
+        const { productId } = req.params
+        const { exactProductId } = req.params
+        const { user_id } = req.session
+
+        let cancel = await Orders.updateOne(
+            { userId: user_id, "orderedProducts._id": productId },
+            {
+                $set: { "orderedProducts.$.status": "Cancelled" }
+            }
+        );
+
+        await Product.updateOne({ _id: exactProductId }, { $inc: { quantity: 1 } })
+        console.log(cancel)
+
+        let cancelled = true
+
+        res.json({ cancelled })
 
 
 
 
 
     } catch (error) {
-        console.log('error rendering ChangePassword:', error)
-        res.status(500).render('error', { error: 'An error occurred while rendering the userAddress' })
+        console.log('error rendering cancelOrder:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the cancelOrder' })
     }
 }
+
+
+
+
+
+
+
+
+
+const deleteAddress = async (req, res) => {
+
+    try {
+        const { addressId } = req.params
+        const address = await userAddress.deleteOne({ _id: addressId })
+
+        res.redirect('/userAddress')
+
+
+
+    } catch (error) {
+        console.log(error)
+
+
+    }
+}
+
+
+
+
+
+
+
+
+let signout = async (req, res) => {
+    try {
+
+
+        req.session.user_id = null;
+        res.redirect('/home')
+
+
+    } catch (error) {
+        console.log('error rendering signout:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the signouts' })
+    }
+}
+
+
+
+
+
+
 
 
 
@@ -706,10 +968,12 @@ module.exports = {
     loadsignup,
     loadLogin,
     loadHome,
+    categorySorting,
     verifiedLogin,
     insertUser,
     verifyMail,
     shopProduct,
+    sortProduct,
     loadRegister,
     resendOtp,
     // beforLogin
@@ -720,8 +984,14 @@ module.exports = {
     editProfile,
     addressLoad,
     addAddress,
+    editAddress,
+    getEditAddress,
+    getOrder,
+    deleteAddress,
+    cancelOrder,
     changePassword,
-    changinPassword
+    changinPassword,
+    signout
 
 
 

@@ -15,6 +15,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg" />
     <!-- Template CSS -->
     <link href="assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 </head>
@@ -49,6 +51,16 @@
                     </a>
 
                 </li>
+
+                <li class="menu-item  ">
+                    <a class="menu-link" href="/admin/orders">
+                        <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">orders</span>
+                    </a>
+
+                </li>
+
+
                 <li class="menu-item ">
                     <a class="menu-link" href="/admin/costomer">
                         <i class="icon material-icons md-shopping_cart"></i>
@@ -64,12 +76,12 @@
 
                 </li>
                 <li class="menu-item  ">
-                    <a class="menu-link" href="page-form-product-1.html">
-                        <i class="icon material-icons md-add_box"></i>
-                        <span class="text">transaction</span>
+                    <a class="menu-link" href="#" id="signOutButton">
+                        <i i class="icon material-icons md-add_box"></i>
+                        <span class="text">Sign out</span>
                     </a>
 
-                </li>
+                    <!-- </li>
                 <li class="menu-item  ">
                     <a class="menu-link" href="page-transactions-1.html">
                         <i class="icon material-icons md-monetization_on"></i>
@@ -115,7 +127,7 @@
                         <i class="icon material-icons md-local_offer"></i>
                         <span class="text"> Starter page </span>
                     </a>
-                </li>
+                </li> -->
             </ul>
             <br />
             <br />
@@ -295,9 +307,13 @@
 
                                         <!-- Example row -->
                                         <tr class="text-md-center ">
-                                            <td>
+                                            <td class="nameofprd">
                                                 <%= liproduct[i].name %>
                                             </td>
+
+
+
+
                                             <td>
                                                 <%= liproduct[i].category?.name %>
                                             </td>
@@ -328,10 +344,13 @@
                                             <td>
 
 
-                                                <button onclick="window.location.href='/admin/edit_product/<%= liproduct[i]._id %>';"
+                                                <button
+                                                    onclick="window.location.href='/admin/edit_product/<%= liproduct[i]._id %>';"
                                                     class="btn btn-sm edit-btn">Edit</button>
                                                 <button onclick="listingProduct('<%= liproduct[i]._id %>','<%=i %>')"
-                                                    id="productid_<%= i %>" class="btn btn-sm delete-btn"><%= liproduct[i].is_blocked == 0 ?'List':'Unlist' %></button>
+                                                    id="productid_<%= i %>" class="btn btn-sm delete-btn">
+                                                    <%= liproduct[i].is_blocked==0 ?'List':'Unlist' %>
+                                                </button>
 
                                             </td>
                                         </tr>
@@ -341,6 +360,26 @@
                                     </tbody>
                         </table>
                     </div>
+                    <script>
+                        // Get all elements with the class nameofprd
+                        let nameElements = document.getElementsByClassName('nameofprd');
+
+                        // Loop through each element
+                        for (let element of nameElements) {
+                            // Check if the length of innerText is greater than 4
+                            if (element.innerText.length >20) {
+                                // Get the current text content
+                                let name = element.innerText;
+
+                                // Modify the name by inserting <br> after the first 10 characters
+                                let modifiedName = name.substring(0, 10) + "<br>" + name.substring(10);
+
+                                // Update the innerHTML of the element with the modified name
+                                element.innerHTML = modifiedName;
+                            }
+                        }
+                    </script>
+
 
                     <script>
 
@@ -370,6 +409,29 @@
 
 
 
+                    </script>
+
+
+                    <script>
+                        document.getElementById('signOutButton').addEventListener('click', function (event) {
+                            event.preventDefault(); // Prevent the default action (e.g., form submission or link navigation)
+
+                            Swal.fire({
+                                title: 'Are you sure you want to sign out?',
+                                text: "Please confirm that you wish to sign out from your account.",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, sign out',
+                                cancelButtonText: 'Cancel'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Proceed with the sign-out process
+                                    window.location.href = '/admin/logout'; // Redirect to the sign-out route
+                                }
+                            });
+                        });
                     </script>
 
 

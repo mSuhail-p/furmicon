@@ -26,7 +26,11 @@ const securepassword = async (password) => {
 
 
 const loadLogin = async (req, res) => {
-    res.render('admin/loginAdmin')
+    try {
+        res.render('admin/loginAdmin')
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 
@@ -37,13 +41,13 @@ const verifyLogin = async (req, res) => {
         const email = req.body.email;
         const password = await securepassword(req.body.password);
 
-        
+
         const credential = await Admin.findOne({ email: email });
 
-        
+
         if (credential) {
             const passwordmatching = await bcrypt.compare(credential.password, password)
-            
+
             if (passwordmatching) {
                 req.session.admin = credential._id;
 
@@ -103,12 +107,12 @@ const userlist = async (req, res) => {
 
 const addCategory = async (req, res) => {
     try {
-         
+
 
         // const exist = await Category.find({ name: new RegExp(req.body.name, 'i') }).exec();
         const exist = await Category.find({ name: new RegExp(req.body.name.trim(), 'i') }).exec();
 
-        
+
 
 
         if (exist.length == 0 && req.body.name.trim() != "") {
@@ -120,7 +124,7 @@ const addCategory = async (req, res) => {
             })
 
             const category = await categories.save();
-            
+
 
 
             const message = '/admin/category'
@@ -150,7 +154,7 @@ const loadCategory = async (req, res) => {
     try {
 
         const allCategory = await Category.find({});
-       
+
 
         // const checking = Category.find({status:false})
 
@@ -169,7 +173,7 @@ const userBlock = async (req, res) => {
     try {
 
         const { userId } = req.params;
-        
+
 
         const isblock = await User.findOne({ _id: userId });
         if (isblock.is_blocked === false) {
@@ -183,12 +187,12 @@ const userBlock = async (req, res) => {
 
             //    res.render('admin/costomer.ejs')
         } else {
-            
+
 
             await User.updateOne({ _id: isblock._id }, { $set: { is_blocked: false } })
             res.redirect('/admin/costomer')
 
-            
+
             //   res.render('admin/costomer.ejs')
 
         }
@@ -204,7 +208,7 @@ const editCategoryLoad = async (req, res) => {
 
         const { categoryId } = req.params
         const editCategory = await Category.findOne({ _id: categoryId })
-        
+
 
         res.render('admin/editCategory', { editCategory })
 
@@ -216,11 +220,12 @@ const editCategoryLoad = async (req, res) => {
 
 
 
-const  editingCategory = async (req, res) => {
+const editingCategory = async (req, res) => {
     try {
 
 
         const categoryId = req.params.catergory_id
+        
         const allCategory = await Category.find({});
 
         // const currentCategory = await Category.findOne({ _id: categoryId });
@@ -233,7 +238,7 @@ const  editingCategory = async (req, res) => {
 
         })
 
-        
+
 
 
         if (duplecate.length === 0 && req.body.name.trim() !== "") {
@@ -265,7 +270,7 @@ const  editingCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const category = req.params.category
-      
+
         const status = await Category.findOne({ _id: category });
         if (status.status) {
             const changing = await Category.findOneAndUpdate({ _id: category }, { $set: { status: false } }, { new: true })
@@ -287,6 +292,19 @@ const deleteCategory = async (req, res) => {
 }
 
 
+const logout = async (req, res) => {
+    try {
+
+        req.session.admin = null
+        res.redirect('/admin')
+
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 
 module.exports = {
     verifyLogin,
@@ -299,5 +317,6 @@ module.exports = {
     addCategory,
     editCategoryLoad,
     deleteCategory,
-    editingCategory
+    editingCategory,
+    logout
 }

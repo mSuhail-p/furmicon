@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #333;
+            color: #fff;
+            padding: 2rem;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .sidebar-nav {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #444;
+        }
+
+        .sidebar-nav a.active {
+            background-color: #007bff;
+        }
+
+        .sidebar-nav a i {
+            margin-right: 0.5rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 2rem;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        #border {
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+
+        .modal-header {
+            background-color: #343a40;
+            color: #fff;
+            padding: 10px 15px;
+        }
+
+        .modal-title {
+            font-size: 1.2em;
+        }
+
+        .modal-body {
+            padding: 15px;
+            font-size: 0.9em;
+        }
+
+        .order-info,
+        .address-info {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .order-info div,
+        .address-info div {
+            flex: 1 1 50%;
+            margin-bottom: 10px;
+        }
+
+        .img-thumbnail {
+            max-width: 50px;
+        }
+
+        .modal-footer {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #orderAddress {
+            margin-top: 15px;
+            font-size: 0.85em;
+        }
+
+        .modal-footer .btn {
+            padding: 5px 10px;
+            font-size: 0.85em;
+        }
+
+        .mt-3 {
+            margin-top: 10px;
+        }
+    </style>
+    <style>
+        .table-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+
+        .table-status {
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .action-buttons .btn {
+            margin: 0 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <style>
+        .navbar-nav .nav-item+.nav-item {
+            margin-left: 20px;
+            /* Adjust the value as needed */
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <h4>Menu</h4>
+                <ul class="sidebar-nav">
+                    <li><a href="/userProfile"><i class="fas fa-user"></i>Profile</a></li>
+                    <li><a href="/userAddress"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                    <li><a href="/getOrder" class="active"><i class="fas fa-shopping-cart"></i>Orders</a></li>
+                    <li><a href="/changePassword"><i class="fas fa-key"></i>Change Password</a></li>
+                    <li><a href="#" id="signOutButton"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                </ul>
+
+
+            </div>
+
+            <div id="border" class="container col-sm-9 mt-5">
+                <h2 class="mb-4 text-center">Orders</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Image</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">view Details</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <% if (orders?.length> 0) { %>
+                                    <% orders.forEach((order, orderIndex)=> { %>
+                                        <% order.orderedProducts.forEach((product, productIndex)=> { %>
+                            <tr>
+                                <td>
+                                    <img src="/userImages/<%= product.productId?.images[0] %>" alt="Product Image"
+                                        class="table-image">
+                                </td>
+                                <td>
+                                    <a href="" class="text-dark">
+                                        <%= product.productId.name %>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span id="orderStatus-<%=productIndex%>-<%=orderIndex %>"
+                                        class="table-status text-danger">
+                                        <%= product.status %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <%= order?.purchasedDate %>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm view-details-btn" data-toggle="modal"
+                                        data-target="#orderModal" data-product-id="<%=product._id%>"
+                                        data-product-index="<%=productIndex%>"
+                                        data-img-src="/userImages/<%=product.productId.images[0]%>"
+                                        data-name="<%=product.productId.name%>" data-cname="<%=order.userName%>"
+                                        data-quantity="<%=product.quantity%>" data-price="<%=product.price%>"
+                                        data-address-name="<%=order.shipAddress[0].name%>"
+                                        data-address-country="<%=order.shipAddress[0].country%>"
+                                        data-address-state=" <%=order.shipAddress[0].state%>"
+                                        data-address-city="<%=order.shipAddress[0].city%> "
+                                        data-address-street="<%=order.shipAddress[0].streetName%> "
+                                        data-address-pin-code="<%=order.shipAddress[0].pinCode%> "
+                                        data-address-phone=" <%=order.shipAddress[0].phone%>"
+                                        data-address-email="<%=order.shipAddress[0].email%> "
+                                        data-order-status="<%=product.status%>"
+                                        data-order-date="<%=order.purchasedDate%>">
+                                        View Details
+                                    </button>
+                                </td>
+                                <td>
+                                    <% if (product.status=="Placed" || product.status=='Shipped' ) { %>
+                                        <button
+                                            onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>')"
+                                            class="btn btn-danger btn-sm" id="cancelBtn">Cancel</button>
+                                        <% } %>
+
+                                </td>
+                            </tr>
+                            <% }); %>
+                                <% }); %>
+                                    <% } %>
+
+                                        </tr>
+                                        <!-- Add more rows as needed -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Include Bootstrap JS and dependencies -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+            <script>
+
+                function cancel(productId, productIndex, orderIndex, exactProductId) {
+
+
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Do you really want to cancel this product?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, cancel it!',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+
+
+                        let status = document.getElementById(`orderStatus-${productIndex}-${orderIndex}`)
+                        console.log("fdsfsdffd")
+                        console.log(exactProductId)
+                        console.log(status)
+                        if (status) {
+                            // console.log(index);
+
+                            axios.patch(`/cancelOrder/${productId}/${exactProductId}`)
+                                .then(response => {
+                                    let data = response.data.cancelled;
+                                    if (data) {
+                                        status.innerHTML = 'Cancelled';
+                                        document.getElementById('cancelBtn').remove()
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error cancelling order:', error);
+                                });
+                        } else {
+                            console.error(`Element with id orderStatus-${productIndex} not found.`);
+                        }
+
+                    })
+                }
+
+
+
+            </script>
+
+
+        </div>
+    </div>
+
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info">
+                        <div><strong>Product Image:</strong><br><img src="" id="productImage" alt="Product Image"
+                                class="img-thumbnail"></div>
+                        <div><strong>Product Name:</strong> <span id="productName"></span></div>
+                        <div><strong>Customer Name:</strong> <span id="customerName"></span></div>
+                        <div><strong>Quantity:</strong> <span id="productQuantity"></span></div>
+                        <div><strong>Price:</strong> ₹<span id="productPrice"></span></div>
+                    </div>
+                    <hr>
+                    <div class="address-info">
+                        <div><strong>Name:</strong> <span id="addressName"></span></div>
+                        <div><strong>Country:</strong> <span id="addressCountry"></span></div>
+                        <div><strong>State:</strong> <span id="addressState"></span></div>
+                        <div><strong>City:</strong> <span id="addressCity"></span></div>
+                        <div><strong>Street:</strong> <span id="addressStreet"></span></div>
+                        <div><strong>Pin Code:</strong> <span id="addressPinCode"></span></div>
+                        <div><strong>Phone:</strong> <span id="addressPhone"></span></div>
+                        <div><strong>Email:</strong> <span id="addressEmail"></span></div>
+                    </div>
+                    <hr>
+                    <div class="mt-3">
+                        <strong>Order Status:</strong> <span id="orderStatus"></span><br>
+                        <strong>Order Date:</strong> <span id="orderDate"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.view-details-btn').click(function () {
+                var button = $(this);
+                var productId = button.data('product-id');
+                var productIndex = button.data('product-index');
+                var imgSrc = button.data('img-src');
+                var name = button.data('name');
+                var cname = button.data('cname');
+                var quantity = button.data('quantity');
+                var price = button.data('price');
+                var addressName = button.data('address-name');
+                var addressCountry = button.data('address-country');
+                var addressState = button.data('address-state');
+                var addressCity = button.data('address-city');
+                var addressStreet = button.data('address-street');
+                var addressPinCode = button.data('address-pin-code');
+                var addressPhone = button.data('address-phone');
+                var addressEmail = button.data('address-email');
+                var orderStatus = button.data('order-status');
+                var orderDate = button.data('order-date');
+
+                $('#productImage').attr('src', imgSrc);
+                $('#productName').text(name);
+                $('#customerName').text(cname);
+                $('#productQuantity').text(quantity);
+                $('#productPrice').text(price);
+                $('#addressName').text(addressName);
+                $('#addressCountry').text(addressCountry);
+                $('#addressState').text(addressState);
+                $('#addressCity').text(addressCity);
+                $('#addressStreet').text(addressStreet);
+                $('#addressPinCode').text(addressPinCode);
+                $('#addressPhone').text(addressPhone);
+                $('#addressEmail').text(addressEmail);
+                $('#orderStatus').text(orderStatus);
+                $('#orderDate').text(orderDate);
+            });
+        });
+    </script>
+
+
+
+
+</body>
+
+</html>

@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -69,6 +73,15 @@
             border-top-right-radius: 10px;
         }
     </style>
+    <style>
+        .error-message {
+            color: red;
+            /* Change the color to your desired value */
+        }
+    </style>
+
+
+
 </head>
 
 <body>
@@ -115,9 +128,9 @@
                 <ul class="sidebar-nav">
                     <li><a href="/userProfile"><i class="fas fa-user"></i>Profile</a></li>
                     <li><a href="/userAddress" class="active "><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                    <li><a href="orders.html"><i class="fas fa-shopping-cart"></i>Orders</a></li>
+                    <li><a href="/getOrder"><i class="fas fa-shopping-cart"></i>Orders</a></li>
                     <li><a href="/changePassword"><i class="fas fa-key"></i>Change Password</a></li>
-                    <li><a href="sign-out.html"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                    <li><a href="#" id="signOutButton"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
                 </ul>
             </div>
 
@@ -128,7 +141,7 @@
                     border-radius: 20px;
                     border-color: rgb(0, 0, 0);
                     border-width: 2px;
-                    height: 540px;
+                    height: 590px;
                     overflow-y: scroll;
 
                 }
@@ -151,10 +164,11 @@
                             <div class="text-center ">
 
                                 <h2>ADDRESS</h2>
+                                <% if(typeof allAddresses !="undefined" ) { %>
+
+
                             </div>
-
                             <% allAddresses.forEach((address)=>{ %>
-
 
 
                                 <style>
@@ -255,13 +269,15 @@
                                     </div>
                                     <div class="row actions">
                                         <div class="">
-                                            <button class="btn btn-primary">Edit</button>
-                                            <button class="btn btn-danger">Delete</button>
+                                            <a href="/editAddress/<%= address._id %>" class="btn btn-primary">Edit</a>
+                                            <a href="/deleteAddress/<%= address._id%>" class="btn btn-danger">Delete</a>
                                         </div>
                                     </div>
                                 </div>
 
                                 <% }) %>
+                                    <% } %>
+
                         </div>
                     </div>
                 </div>
@@ -274,91 +290,91 @@
 
 
 
-            <!-- MODAL  -->
+        <!-- MODAL  -->
 
-            <!-- Modal -->
-            <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="/addAddress" method="post">
-                                <div class="form-group">
-                                    <label for="firstName">First Name</label>
-                                    <input type="text" name="fname" class="form-control" id="firstName">
-                                </div>
-                                <div class="form-group">
-                                    <label for="lastName">Last Name</label>
-                                    <input type="text" name="lname" class="form-control" id="lastName">
-                                </div>
-                                <div class="form-group">
-                                    <label for="country">Country</label>
-                                    <select name="country" class="form-control" id="country">
-                                        <option value="">Select Country</option>
-                                        <option value="Afghanistan">Afghanistan</option>
-                                        <option value="Argentina">Argentina</option>
-                                        <option value="Australia">Australia</option>
-                                        <option value="Brazil">Brazil</option>
-                                        <option value="Canada">Canada</option>
-                                        <option value="China">China</option>
-                                        <option value="France">France</option>
-                                        <option value="Germany">Germany</option>
-                                        <option value="India">India</option>
-                                        <option value="Indonesia">Indonesia</option>
-                                        <option value="Italy">Italy</option>
-                                        <option value="Japan">Japan</option>
-                                        <option value="Mexico">Mexico</option>
-                                        <option value="Nigeria">Nigeria</option>
-                                        <option value="Pakistan">Pakistan</option>
-                                        <option value="Russia">Russia</option>
-                                        <option value="Saudi Arabia">Saudi Arabia</option>
-                                        <option value="South Africa">South Africa</option>
-                                        <option value="South Korea">South Korea</option>
-                                        <option value="Turkey">Turkey</option>
-                                        <option value="United Kingdom">United Kingdom</option>
-                                        <option value="United States">United States</option>
-                                    </select>
+        <!-- Modal -->
+        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="modal" action="/addAddress" method="post">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" name="fname" class="form-control" id="firstName">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" name="lname" class="form-control" id="lastName">
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <select name="country" class="form-control" id="country">
+                                    <option value="">Select Country</option>
+                                    <option value="Afghanistan">Afghanistan</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Brazil">Brazil</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="China">China</option>
+                                    <option value="France">France</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="India">India</option>
+                                    <option value="Indonesia">Indonesia</option>
+                                    <option value="Italy">Italy</option>
+                                    <option value="Japan">Japan</option>
+                                    <option value="Mexico">Mexico</option>
+                                    <option value="Nigeria">Nigeria</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                    <option value="Russia">Russia</option>
+                                    <option value="Saudi Arabia">Saudi Arabia</option>
+                                    <option value="South Africa">South Africa</option>
+                                    <option value="South Korea">South Korea</option>
+                                    <option value="Turkey">Turkey</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="United States">United States</option>
+                                </select>
 
-                                </div>
-                                <div class="form-group">
-                                    <label for="streetName">Street Name</label>
-                                    <input type="text" name="street" class="form-control" id="streetName">
-                                </div>
-                                <div class="form-group">
-                                    <label for="town">Town</label>
-                                    <input type="text" name="town" class="form-control" id="town">
-                                </div>
-                                <div class="form-group">
-                                    <label for="state">State</label>
-                                    <input type="text" name="state" class="form-control" id="state">
-                                </div>
-                                <div class="form-group">
-                                    <label for="postcode">Postcode</label>
-                                    <input type="number" name="pin" class="form-control" id="postcode" pattern="\d{6}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="phone">Phone</label>
-                                    <input type="number" name="mobile" class="form-control" id="phone">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" name="email" class="form-control" id="email">
-                                </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <input type="submit" class="btn btn-primary" id="submitBtn" value="Submit">
-                            </form>
-                        </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="streetName">Street Name</label>
+                                <input type="text" name="street" class="form-control" id="streetName">
+                            </div>
+                            <div class="form-group">
+                                <label for="town">Town</label>
+                                <input type="text" name="town" class="form-control" id="town">
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" name="state" class="form-control" id="state">
+                            </div>
+                            <div class="form-group">
+                                <label for="postcode">Postcode</label>
+                                <input type="number" name="pin" class="form-control" id="postcode" pattern="\d{6}">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="number" name="mobile" class="form-control" id="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" class="form-control" id="email">
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-primary" id="submitBtn" value="Submit">
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
 
 
 
@@ -366,74 +382,140 @@
 
 
 
+        <!-- ADD ADDRESS SCRIPT -->
 
+        <script>
+            // Get references to the form and input fields
+            const form = document.querySelector('#modal');
+            const firstNameInput = document.querySelector('#firstName');
+            const lastNameInput = document.querySelector('#lastName');
+            const countrySelect = document.querySelector('#country');
+            const streetInput = document.querySelector('#streetName');
+            const townInput = document.querySelector('#town');
+            const stateInput = document.querySelector('#state');
+            const postcodeInput = document.querySelector('#postcode');
+            const phoneInput = document.querySelector('#phone');
+            const emailInput = document.querySelector('#email');
 
-            <!-- /////////////////// -->
+            // Add event listener to the form submit button
+            form.addEventListener('submit', (event) => {
+                // Clear any existing error messages
+                clearErrorMessages();
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    document.getElementById('submitBtn').addEventListener('click', function () {
-                        // Get form values
-                        const name = document.getElementById('name').value.trim();
-                        const email = document.getElementById('email').value.trim();
-                        const phone = document.getElementById('phone').value.trim();
+                // Validate the form fields
+                const isValid = validateForm();
 
-                        // Validate form fields
-                        if (name === '') {
-                            alert('Please enter your name.');
-                            return;
-                        }
+                if (!isValid) {
+                    // If the form is not valid, prevent the form from submitting
+                    event.preventDefault(); // Prevent the form from submitting
+                }
+            });
 
-                        if (email === '') {
-                            alert('Please enter your email.');
-                            return;
-                        }
-
-                        if (!isValidEmail(email)) {
-                            alert('Please enter a valid email address.');
-                            return;
-                        }
-
-                        if (phone === '') {
-                            alert('Please enter your phone number.');
-                            return;
-                        }
-
-                        if (!isValidPhoneNumber(phone)) {
-                            alert('plers')
-                            return;
-                        }
-
-                    });
+            // Function to clear any existing error messages
+            function clearErrorMessages() {
+                const errorMessages = document.querySelectorAll('.error-message');
+                errorMessages.forEach((message) => {
+                    message.remove();
                 });
+            }
 
-                // Email validation function
-                function isValidEmail(email) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    return emailRegex.test(email);
+            // Function to validate the form fields
+            function validateForm() {
+                let isValid = true;
+
+                // Check if any field is empty
+                if (firstNameInput.value.trim() === '') {
+                    displayErrorMessage(firstNameInput, 'First name is required');
+                    isValid = false;
                 }
 
-                // Phone number validation function
-                function isValidPhoneNumber(phone) {
-                    const phoneRegex = /^\d{10}$/; // Assuming a 10-digit phone number
-                    return phoneRegex.test(phone);
+                if (lastNameInput.value.trim() === '') {
+                    displayErrorMessage(lastNameInput, 'Last name is required');
+                    isValid = false;
                 }
-            </script>
+
+                if (countrySelect.value === '') {
+                    displayErrorMessage(countrySelect, 'Country is required');
+                    isValid = false;
+                }
+
+                if (streetInput.value.trim() === '') {
+                    displayErrorMessage(streetInput, 'Street name is required');
+                    isValid = false;
+                }
+
+                if (townInput.value.trim() === '') {
+                    displayErrorMessage(townInput, 'Town is required');
+                    isValid = false;
+                }
+
+                if (stateInput.value.trim() === '') {
+                    displayErrorMessage(stateInput, 'State is required');
+                    isValid = false;
+                }
+
+                if (postcodeInput.value.trim() === '') {
+                    displayErrorMessage(postcodeInput, 'Postcode is required');
+                    isValid = false;
+                }
+
+                if (phoneInput.value.trim() === '') {
+                    displayErrorMessage(phoneInput, 'Phone number is required');
+                    isValid = false;
+                }
+
+                if (emailInput.value.trim() === '') {
+                    displayErrorMessage(emailInput, 'Email is required');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            // Function to display an error message under an input field
+            function displayErrorMessage(input, message) {
+                const errorMessage = document.createElement('div');
+                errorMessage.classList.add('error-message');
+                errorMessage.textContent = message;
+                input.after(errorMessage);
+            }
+        </script>
+
+
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
 
 
-            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+        <script>
+            document.getElementById('signOutButton').addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent the default action (e.g., form submission or link navigation)
+
+                Swal.fire({
+                    title: 'Are you sure you want to sign out?',
+                    text: "Please confirm that you wish to sign out from your account.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, sign out',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Proceed with the sign-out process
+                        window.location.href = '/signout'; // Redirect to the sign-out route
+                    }
+                });
+            });
+        </script>
 
 
 
-            <script>
-
-
-
-            </script>
 
 </body>
 

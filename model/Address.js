@@ -1,6 +1,6 @@
 let mongoose = require('mongoose');
 
-let userAddress = mongoose.Schema({
+let userAddress = new mongoose.Schema({
 
    userId:{
       type:mongoose.Schema.Types.ObjectId,

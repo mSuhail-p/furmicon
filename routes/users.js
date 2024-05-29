@@ -12,6 +12,7 @@ router.use(passport.session());
 const userController = require('../controllers/userController')
 const auth = require('../middleware/auth')
 const cartController  = require('../controllers/cartController')
+const checkoutController  = require('../controllers/checkoutController')
 // const path=require('path');
 // console.log("dira : ",__dirname);
 
@@ -42,9 +43,11 @@ router.post('/signUp', userController.insertUser)
 router.get('/login',userController.loadLogin)
 router.post('/login', userController.verifiedLogin)
 router.get('/home', auth.is_logout, auth.isAuthenticated, auth.is_blocked, userController.loadHome)
+router.get('/categorySorting/:categoryId', auth.isAuthenticated, auth.is_blocked, userController.categorySorting)
  
 //shop
 router.get('/shop', auth.is_blocked, userController.shopProduct)
+router.get('/sort/:method',auth.is_blocked, userController.sortProduct)
 
 //OTP VERIFICATION
 router.post('/verify', userController.verifyMail)
@@ -54,19 +57,35 @@ router.get('/resend', userController.resendOtp)
 //product details
 // router.get('/details',userController.productDetails)
 router.get('/details/:product_id', auth.is_blocked, userController.productDetails)
+
+
+//CART
 router.get('/viewCart', auth.is_blocked, auth.cart,cartController.viewCart)
 router.get('/addToCart/:productId/:quantity',auth.cart,cartController.addToCart)
 router.patch('/removeCart/:productId',cartController.removeCart)
+router.patch('/ProductQuantity',auth.cart,cartController.productQuantity)
+
+
+//checkout
+router.get('/getCheckout',auth.cart,checkoutController.getCheckout)
+router.post('/placeOrder',auth.cart,checkoutController.placeOrder)
+router.get('/orderPlaced/:orderId',auth.cart,checkoutController.orderPlaced)
 
 
 
 //userProfile
 router.get('/userProfile',auth.authenticate,userController.userProfile)
 router.post('/editProfile',userController.editProfile)
-router.get('/userAddress',userController.addressLoad)
+router.get('/userAddress',auth.authenticate,userController.addressLoad)
 router.post('/addAddress',userController.addAddress)
+router.get('/editAddress/:addressId',auth.authenticate,userController.getEditAddress)
+router.post('/editAddress',userController.editAddress)
+router.get('/deleteAddress/:addressId',userController.deleteAddress)
 router.get('/changePassword',userController.changePassword)
 router.post('/changePassword',userController.changinPassword)
+router.get('/getOrder',auth.authenticate,userController.getOrder)
+router.patch('/cancelOrder/:productId/:exactProductId',userController.cancelOrder)
+router.get('/signout',userController.signout)
  
 
 

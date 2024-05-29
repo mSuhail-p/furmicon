@@ -11,164 +11,218 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 
-<body class="bg-dark  ">
-    <div class="container w-50  bg-white  ">
-        <h2>Product Form</h2>
+
+<body style="background: #c8c8c8;">
+
+    <div class="container w-50 border border-info-subtle bg-light border rounded rounded-bottom-circle   mt-5">
+        <h4 class="text-center ">ADD PRODUCT</h4>
         <form action="/admin/add_product" method="POST" id="productForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" id="name" name="name" >
+                <input type="text" class="form-control" id="name" name="name">
+                <div id="nameError" class="error"></div>
             </div>
+
+
+
             <div class="form-group">
                 <label for="category">Category:</label>
                 <select class="form-control" id="category" name="category">
                     <option value="">Select Category</option>
-                    <% categories.forEach(element => { %>
-                        
-                  
-                    <option value="<%= element._id %>"><%= element.name %></option>
-            <%   }) %>
-                    
-                    <!-- Add more categories as needed -->
+                    <% categories.forEach(element=> { %>
+                        <option value="<%= element._id %>">
+                            <%= element.name %>
+                        </option>
+                        <% }) %>
                 </select>
+                <div id="categoryError" class="error"></div>
             </div>
             <div class="form-group">
                 <label for="price">Price:</label>
-                <input type="number" class="form-control" id="price" name="price" >
+                <input type="number" class="form-control" id="price" name="price">
+                <div id="priceError" class="error"></div>
             </div>
             <div class="form-group">
                 <label for="quantity">Quantity:</label>
-                <input type="number" class="form-control" id="quantity" name="quantity" >
+                <input type="number" class="form-control" id="quantity" name="quantity">
+                <div id="quantityError" class="error"></div>
             </div>
             <div class="form-group">
                 <label for="images">Images:</label>
-                <input class="btn border rounded " type="file" class="form-control" id="images" name="images[]" multiple  >
-            </div>
-
-
-            <div class="col-12">
-                <label for="images" class="form-label">Images (Max 4, crop and resize):</label>
-                <div id="imageUpload" class="dropzone"></div>
+                <input type="file" class="form-control " id="images" name="images[]" multiple>
+                <div id="imagesError" class="error"></div>
                 <div id="imagePreview" class="mt-3"></div>
-                <input type="hidden" id="croppedImages" name="croppedImages">
             </div>
-            
-
-             
-
- 
-
-
-
-            <!-- <div id="image-preview" class="form-group"></div>
-            <button id="crop-button" class="btn btn-primary form-group">Crop Image</button> -->
-
-
             <div class="form-group">
                 <label for="description">Description:</label>
-                <textarea class="form-control" id="description" name="description" rows="3"  ></textarea>
+                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                <div id="descriptionError" class="error"></div>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 
-    <!-- Include a JavaScript file for client-side validation and image handling -->
-    <script src="formValidation.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
     <script>
-        // Initialize Croppie for image cropping
-        var croppies = []; // Array to store Croppie instances
-    
-        // Handle image selection for cropping
-        document.getElementById('images').addEventListener('change', function(event) {
-            var files = event.target.files;
-            var imagePreview = document.getElementById('imagePreview');
-            imagePreview.innerHTML = ''; // Clear previous image previews
-    
-            // Check if more than 4 images are selected
-            if (files.length > 4) {
-                alert('You can only select up to 4 images.');
-                this.value = ''; // Clear the file input
-                return; // Exit the function
+        $(document).ready(function () {
+            var croppies = [];
+            var fileCount = 0;
+
+            $('#images').on('change', function (event) {
+                var files = event.target.files;
+                var imagePreview = $('#imagePreview');
+                imagePreview.empty(); // Clear previous image previews
+                croppies = []; // Reset croppies array
+
+                if (files.length > 4) {
+                    showError('imagesError', 'You can only select up to 4 images.');
+                    this.value = ''; // Clear the file input
+                    return;
+                }
+
+                for (var i = 0; i < files.length; i++) {
+                    if (!files[i].type.startsWith('image/')) {
+                        showError('imagesError', 'Only image files are allowed.');
+                        this.value = ''; // Clear the file input
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var img = $('<img>').attr('src', e.target.result).addClass('img-thumbnail mr-2 mb-2');
+                        imagePreview.append(img);
+
+                        var croppie = new Croppie(img[0], {
+                            viewport: { width: 200, height: 200 },
+                            boundary: { width: 300, height: 300 },
+                            showZoomer: true
+                        });
+                        croppies.push(croppie);
+                    };
+                    reader.readAsDataURL(files[i]);
+                }
+
+                if (files.length < 3) {
+                    showError('imagesError', 'You must select at least 3 images.');
+                    this.value = ''; // Clear the file input
+                    return;
+                }
+
+                clearError('imagesError');
+                fileCount = files.length;
+            });
+
+            function showError(elementId, message) {
+                $('#' + elementId).text(message);
             }
-    
-            // Create a Croppie instance for each selected image
-            for (var i = 0; i < files.length; i++) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.classList.add('img-thumbnail', 'mr-2', 'mb-2');
-                    imagePreview.appendChild(img);
-    
-                    // Create a new Croppie instance for this image
-                    var croppie = new Croppie(img, {
-                        viewport: { width: 200, height: 200 },
-                        boundary: { width: 300, height: 300 },
-                        showZoomer: true
+
+            function clearError(elementId) {
+                $('#' + elementId).text('');
+            }
+
+            $('#productForm').on('submit', function (event) {
+                event.preventDefault();
+
+                var valid = true;
+
+                var name = $('#name').val().trim();
+                var category = $('#category').val();
+                var price = $('#price').val().trim();
+                var quantity = $('#quantity').val().trim();
+                var description = $('#description').val().trim();
+
+                if (name === '') {
+                    showError('nameError', 'Name is required.');
+                    valid = false;
+                } else {
+                    clearError('nameError');
+                }
+
+                if (category === '') {
+                    showError('categoryError', 'Category is required.');
+                    valid = false;
+                } else {
+                    clearError('categoryError');
+                }
+
+                if (price === '' || price < 0) {
+                    showError('priceError', 'Price must be a positive number.');
+                    valid = false;
+                } else {
+                    clearError('priceError');
+                }
+
+                if (quantity === '' || quantity < 0) {
+                    showError('quantityError', 'Quantity must be zero or a positive number.');
+                    valid = false;
+                } else {
+                    clearError('quantityError');
+                }
+
+                if (fileCount < 3 || fileCount > 4) {
+                    showError('imagesError', 'You must select between 3 and 4 images.');
+                    valid = false;
+                } else {
+                    clearError('imagesError');
+                }
+
+                if (description === '') {
+                    showError('descriptionError', 'Description is required.');
+                    valid = false;
+                } else {
+                    clearError('descriptionError');
+                }
+
+                if (valid) {
+                    var croppedImages = [];
+                    var processedCount = 0;
+
+                    croppies.forEach(function (croppie) {
+                        croppie.result('blob').then(function (blob) {
+                            croppedImages.push(blob);
+                            processedCount++;
+
+                            if (processedCount === croppies.length) {
+                                var formData = new FormData();
+                                formData.append('name', name);
+                                formData.append('category', category);
+                                formData.append('price', price);
+                                formData.append('quantity', quantity);
+                                formData.append('description', description);
+                                croppedImages.forEach(function (croppedImage, index) {
+                                    formData.append('croppedImages[]', croppedImage, 'image' + index + '.png');
+                                });
+
+                                $.ajax({
+                                    url: '/admin/add_product',
+                                    type: 'POST',
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (response) {
+                                        // alert('Product added successfully!');
+                                        window.location.href = '/admin/product'
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+                                        alert('Error adding product: ' + errorThrown);
+                                    }
+                                });
+                            }
+                        });
                     });
-                    croppies.push(croppie); // Add Croppie instance to the array
-                };
-                reader.readAsDataURL(files[i]);
-            }
-        });
-    
-        // Handle cropping for each image
-        document.getElementById('crop-button').addEventListener('click', function() {
-            for (var i = 0; i < croppies.length; i++) {
-                croppies[i].result('blob').then(function(blob) {
-                    // You can now use the cropped image blob
-                    console.log(blob);
-                    // Optionally, you can display the cropped image or upload it to a server
-                });
-            }
-        });
-    
-        // Prevent form submission if more than 4 files are selected
-        document.getElementById('productForm').addEventListener('submit', function(event) {
-            var files = document.getElementById('images').files;
-            if (files.length > 4) {
-                alert('You can only select up to 4 images.');
-                event.preventDefault(); // Prevent form submission
-            }
+                }
+            });
         });
     </script>
-
-<script>
-    // Function to validate form inputs
-    function validateForm() {
-        var name = document.getElementById('name').value.trim();
-        var category = document.getElementById('category').value;
-        var price = document.getElementById('price').value.trim();
-        var quantity = document.getElementById('quantity').value.trim();
-        var images = document.getElementById('images').files;
-        var description = document.getElementById('description').value.trim();
-
-        if (name === '' || category === '' || price === '' || quantity === '' || images.length === 0 || description === '') {
-            alert('Please fill in all fields.');
-            return false; // Prevent form submission
-        }
-
-        if (images.length > 4) {
-            alert('You can only select up to 4 images.');
-            return false; // Prevent form submission
-        }
-
-        // Additional validation logic can be added here if needed
-
-        return true; // Allow form submission
-    }
-
-    // Event listener for form submission
-    document.getElementById('productForm').addEventListener('submit', function (event) {
-        if (!validateForm()) {
-            event.preventDefault(); // Prevent form submission if validation fails
-        }
-    });
-</script>
-            
-    
 </body>
 
 </html>

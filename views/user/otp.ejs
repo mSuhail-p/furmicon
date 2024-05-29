@@ -35,14 +35,6 @@
               <button type="submit" class="btn btn-success btn-block">Verify OTP</button>
 
 
-              <% if (typeof message!='undefined' ) { %>
-                <div>
-                  <script>
-                    // Show a basic SweetAlert2 message
-                    Swal.fire("Invalid OTP");
-                  </script>
-                </div>
-                <% } %>
 
             </form>
           </div>
@@ -52,71 +44,122 @@
   </div>
 
 
-
-
-
-
-  <!-- Bootstrap JS and jQuery -->
-
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-  <!-- Timer script -->
-  <script>
-    var countdown = 60;
-    var timer = null;
-
-    function startTimer() {
-      timer = setInterval(function () {
-        countdown--;
-        document.getElementById('countdown').innerHTML = countdown;
-        if (countdown <= 0) {
-          clearInterval(timer);
-          document.getElementById('timer').innerHTML = "Time expired. Resend OTP.";
-          document.getElementById('resendBtn').disabled = false; // Enable the resend button
-        }
-      }, 1000);
-    }
-    startTimer();
-
-    function combinfunction() {
-      resendOTP();
-      sendPostRequest();
-    }
-
-    function resendOTP() {
-      // Add logic to resend OTP, for now, reset the timer
-      countdown = 60;
-      document.getElementById('timer').innerHTML = "OTP resent. Time remaining: <span id='countdown'>60</span> seconds";
-      startTimer();
-      document.getElementById('resendBtn').disabled = true; // Disable the resend button again
-    }
-
-    function sendPostRequest() {
-      const url = '/resend'; // Replace with your actual backend endpoint
-
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+  <% if (typeof message!='undefined' ) { %>
+    <div>
+      <script>
+        // Show a basic SweetAlert2 message
+        Swal.fire({
+          title: 'Invalid otp',
+          icon: 'error',
+          confirmButtonText: 'Yes',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // User clicked confirm button
+            combinfunction()// Function call after the SweetAlert dialog is closed
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // User clicked cancel button or closed the dialog using the overlay
+            // No action needed
           }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Response:', data);
-          // Handle the response as needed
-        })
-        .catch(error => {
-          console.error('Error:', error.message);
         });
-    }
-  </script>
+      </script>
+    </div>
+    <% } %>
+
+      <% if (typeof expires!='undefined' ) { %>
+        <div>
+          <script>
+            Swal.fire({
+              title: 'Invalid otp',
+              icon: 'error',
+              confirmButtonText: 'Yes',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // User clicked confirm button
+                combinfunction() // Function call after the SweetAlert dialog is closed
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // User clicked cancel button or closed the dialog using the overlay
+                // No action needed
+              }
+            });
+          </script>
+        </div>
+        <% } %>
+
+
+
+
+
+
+          <!-- Bootstrap JS and jQuery -->
+
+          <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+          <!-- Timer script -->
+          <script>
+            var countdown = 60;
+            // var timer = null;
+
+            let timer; // Declare the timer variable outside the function
+
+            function startTimer() {
+              // Clear any existing interval
+              clearInterval(timer);
+
+              let countdown = 60; // Set the countdown to 60 seconds (or any desired value)
+
+              timer = setInterval(function () {
+                countdown--;
+                document.getElementById('countdown').innerHTML = countdown;
+                if (countdown <= 0) {
+                  clearInterval(timer);
+                  document.getElementById('timer').innerHTML = "Time expired. Resend OTP.";
+                  document.getElementById('resendBtn').disabled = false; // Enable the resend button
+                }
+              }, 1000); // Repeat every 1000 milliseconds (1 second)
+            }
+            startTimer();
+
+            function combinfunction() {
+              resendOTP();
+              sendPostRequest();
+            }
+
+            function resendOTP() {
+              // Add logic to resend OTP, for now, reset the timer
+              countdown = 60;
+              document.getElementById('timer').innerHTML = "OTP resent. Time remaining: <span id='countdown'>60</span> seconds";
+              startTimer();
+              document.getElementById('resendBtn').disabled = true; // Disable the resend button again
+            }
+
+            function sendPostRequest() {
+              const url = '/resend'; // Replace with your actual backend endpoint
+
+              fetch(url, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+              })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('Response:', data);
+                  // Handle the response as needed
+                })
+                .catch(error => {
+                  console.error('Error:', error.message);
+                });
+            }
+          </script>
 
 
 </body>
