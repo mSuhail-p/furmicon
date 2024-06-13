@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="../assets/css/plugins/nouislider/nouislider.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         .owl-stage-outer {
@@ -77,10 +78,8 @@
                                 <a href="#">Links</a>
                                 <ul>
                                     <li><a href="tel:#"><i class="icon-phone"></i>Call: +91 9400981702</a></li>
-                                    <li><a href="wishlist.html"><i class="icon-heart-o"></i>Wishlist
-                                            <span>(3)</span></a></li>
-                                    <li><a href="#">About Us</a></li>
-                                    <li><a href="#">Contact Us</a></li>
+                                    <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist
+                                    
 
                             </li>
                         </ul>
@@ -181,17 +180,6 @@
                         <li class="breadcrumb-item active" aria-current="page">Proudct</li>
                     </ol>
 
-                    <nav class="product-pager ml-auto" aria-label="Product">
-                        <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
-                            <i class="icon-angle-left"></i>
-                            <span>Prev</span>
-                        </a>
-
-                        <a class="product-pager-link product-pager-next" href="#" aria-label="Next" tabindex="-1">
-                            <span>Next</span>
-                            <i class="icon-angle-right"></i>
-                        </a>
-                    </nav><!-- End .pager-nav -->
                 </div><!-- End .container -->
             </nav><!-- End .breadcrumb-nav -->
             <% if(product) { %>
@@ -263,7 +251,11 @@
                                         </div><!-- End .rating-container -->
 
                                         <div class="product-price">
-                                            ₹ <%= product.price %>
+                                            <% if(product.offer || product.category.offer){ %>
+                                                <span class="old-price">₹ <%= product.price%></span>
+
+                                           <%  } %> 
+                                           <span>₹ <%= product.offerPrice %></span>
                                         </div><!-- End .product-price -->
 
                                         <div class="product-content">
@@ -329,8 +321,8 @@
                                                     <button onclick="addCart('<%=product._id %>')"
                                                         class="btn-product btn-cart"><span>add to cart</span></button>
 
-                                                    <div class="details-action-wrapper">
-                                                        <a href="#" class="btn-product btn-wishlist"
+                                                    <div class="details-action-wrapper"><i class="fas fa-heart"></i>
+                                                        <a href="/addToWishlist/<%=product._id %>" class="btn-product"
                                                             title="Wishlist"><span>Add
                                                                 to
                                                                 Wishlist</span></a>

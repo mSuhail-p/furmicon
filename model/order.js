@@ -92,6 +92,10 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
         type: String,
         required:true
+    },
+    orderedTime:{
+        type:Date,
+        required:true
     }
 
 

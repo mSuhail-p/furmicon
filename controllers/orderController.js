@@ -11,7 +11,7 @@ const getOrder = async (req, res) => {
         let Orderdoc = await Order.find({}).populate({
             path: 'orderedProducts.productId',
             model: 'Product'
-        }).sort({purchasedDate:-1})
+        }).sort({ orderedTime: -1 })
         console.log(Orderdoc[0].orderedProducts[0].productId.price)
 
         res.render('admin/order', { Orderdoc })
@@ -29,7 +29,7 @@ const getOrder = async (req, res) => {
 
 const changeOrderStatus = async (req, res) => {
     try {
-         
+
         const { productId } = req.params
         const { status } = req.params
         const { exactProductId } = req.params

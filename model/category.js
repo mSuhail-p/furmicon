@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const categorySchema = new mongoose.Schema({
     name:{
         type:String,
@@ -8,6 +7,11 @@ const categorySchema = new mongoose.Schema({
     description:{
         type:String,
         required:true
+    },
+    offer:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Offers'
+
     },
     status:{
         type:Boolean,

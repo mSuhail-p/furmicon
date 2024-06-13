@@ -75,8 +75,6 @@ const viewCart = async (req, res) => {
             populate: { path: 'productId' }
         })
 
-        console.log(displayCart, 'it is displayCart')
-
         // console.log(displayCart[0].Products[0].productId.images, 'it is images')
         res.render('user/cart', { displayCart })
     } catch (error) {

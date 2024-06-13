@@ -13,10 +13,8 @@ const userController = require('../controllers/userController')
 const auth = require('../middleware/auth')
 const cartController  = require('../controllers/cartController')
 const checkoutController  = require('../controllers/checkoutController')
-// const path=require('path');
-// console.log("dira : ",__dirname);
-
-//before login
+const wishlistController = require('../controllers/wishlistController')
+const walletController = require('../controllers/walletController')
 
 router.get('/', auth.isAuthenticated, userController.loadHome)
 
@@ -48,6 +46,7 @@ router.get('/categorySorting/:categoryId', auth.isAuthenticated, auth.is_blocked
 //shop
 router.get('/shop', auth.is_blocked, userController.shopProduct)
 router.get('/sort/:method',auth.is_blocked, userController.sortProduct)
+router.get('/searchProducts',auth.is_blocked, userController.searchProduct)
 
 //OTP VERIFICATION
 router.post('/verify', userController.verifyMail)
@@ -70,12 +69,13 @@ router.patch('/ProductQuantity',auth.cart,cartController.productQuantity)
 router.get('/getCheckout',auth.cart,checkoutController.getCheckout)
 router.post('/placeOrder',auth.cart,checkoutController.placeOrder)
 router.get('/orderPlaced/:orderId',auth.cart,checkoutController.orderPlaced)
+router.post('/verifyPayment',auth.cart,checkoutController.verifyPayment)
 
 
 
 //userProfile
 router.get('/userProfile',auth.authenticate,userController.userProfile)
-router.post('/editProfile',userController.editProfile)
+router.post('/editProfile',auth.authenticate,userController.editProfile)
 router.get('/userAddress',auth.authenticate,userController.addressLoad)
 router.post('/addAddress',userController.addAddress)
 router.get('/editAddress/:addressId',auth.authenticate,userController.getEditAddress)
@@ -84,13 +84,19 @@ router.get('/deleteAddress/:addressId',userController.deleteAddress)
 router.get('/changePassword',userController.changePassword)
 router.post('/changePassword',userController.changinPassword)
 router.get('/getOrder',auth.authenticate,userController.getOrder)
-router.patch('/cancelOrder/:productId/:exactProductId',userController.cancelOrder)
+router.patch('/cancelOrder/:productId/:exactProductId/:orderId',userController.cancelOrder)
 router.get('/signout',userController.signout)
+
+//WALLET
+router.get('/getWallet',walletController.getWallet)
  
 
 
 //wihslist
-router.get('/wishlist',userController.viewWishlist)
+router.get('/wishlist',wishlistController.viewWishlist)
+router.get('/addToWishlist/:productID',wishlistController.addToWishlist)
+router.delete('/removeWishlist/:productId',wishlistController.removeWishlist)
+
 
 
 

@@ -3,6 +3,7 @@ const Category = require('../model/category')
 const mongoose = require('mongoose');
 const fs = require('fs');
 const { product } = require('./adminController');
+const Offer = require('../model/OfferModel')
 // const { product } = require('./adminController');
 
 
@@ -66,7 +67,8 @@ const addProduct = async (req, res) => {
 const loadproduct = async (req, res) => {
     try {
 
-        const liproduct = await Product.find({}).populate('category')
+        const liproduct = await Product.find({}).populate('category').populate('offer')
+        // console.log(liproduct[0].offer.offerName,'it is offer name')
 
         if (liproduct) {
             // console.log(liproduct[0].category + "categoryyyyyyyyyyyyyyyyyy")
@@ -116,28 +118,27 @@ const editProductLoad = async (req, res) => {
     try {
 
         const productid = req.params.editProduct
+        let offer = await Offer.find({ type: 'product' })
         const categories = await Category.find({})
-        // console.log(categories)
 
-        const sendToEdit = await Product.findOne({ _id: productid }).populate('category')
+        const sendToEdit = await Product.findOne({ _id: productid }).populate('category').populate('offer')
 
-        // console.log(sendToEdit.category)
-
-        console.log(sendToEdit)
+         
 
 
 
-        res.render('admin/editProduct', { sendToEdit, categories });
+        res.render('admin/editProduct', { sendToEdit, categories, offer });
 
 
     } catch (error) {
-        console.log('error')
+        console.log(error)
     }
 }
 
 
 const edit_product = async (req, res) => {
     try {
+        console.log('it edit product')
         const { productId } = req.params;
         const { name, category, price, quantity, description, existingImages } = req.body;
 
@@ -167,6 +168,31 @@ const edit_product = async (req, res) => {
     }
 };
 
+const saveOffer = async (req, res) => {
+    try {
+
+        const { offerId } = req.params
+        const { productId } = req.params
+        console.log(productId, 'it is productid')
+        const selectedOffer = await Offer.findOne({ _id: offerId })
+        const offeredProduct = await Product.findOne({ _id: productId })
+        let offerPrice = offeredProduct.price - (selectedOffer.offPercentage / 100) * offeredProduct.price
+        let addOffer = await Product.findOneAndUpdate({ _id: productId }, { $set: { offer: offerId, offerPrice: offerPrice } })
+        console.log(addOffer, 'it is addoffer')
+
+        res.json({status:true})
+
+
+
+
+
+
+    } catch (error) {
+
+        console.log('an error rendering saveOffer:', error)
+    }
+}
+
 
 
 
@@ -186,6 +212,7 @@ module.exports = {
     blockProduct,
     editProductLoad,
     edit_product,
+    saveOffer
 
 }
 

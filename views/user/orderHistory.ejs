@@ -197,6 +197,7 @@
                     <li><a href="/userAddress"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
                     <li><a href="/getOrder" class="active"><i class="fas fa-shopping-cart"></i>Orders</a></li>
                     <li><a href="/changePassword"><i class="fas fa-key"></i>Change Password</a></li>
+                    <li><a href="/getWallet" class=""><i class="fas fa-key"></i>Wallet</a></li>
                     <li><a href="#" id="signOutButton"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
                 </ul>
 
@@ -264,8 +265,9 @@
                                 <td>
                                     <% if (product.status=="Placed" || product.status=='Shipped' ) { %>
                                         <button
-                                            onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>')"
-                                            class="btn btn-danger btn-sm" id="cancelBtn">Cancel</button>
+                                            onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
+                                            class="btn btn-danger btn-sm"
+                                            id="cancelBtn-<%=productIndex%>">Cancel</button>
                                         <% } %>
 
                                 </td>
@@ -286,7 +288,7 @@
 
             <script>
 
-                function cancel(productId, productIndex, orderIndex, exactProductId) {
+                function cancel(productId, productIndex, orderIndex, exactProductId,orderId) {
 
 
 
@@ -298,26 +300,30 @@
                         confirmButtonText: 'Yes, cancel it!',
                         cancelButtonText: 'No, keep it'
                     }).then((result) => {
+                        if (result.isConfirmed) {
 
 
-                        let status = document.getElementById(`orderStatus-${productIndex}-${orderIndex}`)
-                        console.log("fdsfsdffd")
-                        console.log(exactProductId)
-                        console.log(status)
-                        if (status) {
-                            // console.log(index);
 
-                            axios.patch(`/cancelOrder/${productId}/${exactProductId}`)
-                                .then(response => {
-                                    let data = response.data.cancelled;
-                                    if (data) {
-                                        status.innerHTML = 'Cancelled';
-                                        document.getElementById('cancelBtn').remove()
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error cancelling order:', error);
-                                });
+                            let status = document.getElementById(`orderStatus-${productIndex}-${orderIndex}`)
+                            console.log("fdsfsdffd")
+                            console.log(exactProductId)
+                            console.log(status)
+                            if (status) {
+                                // console.log(index);
+
+                                axios.patch(`/cancelOrder/${productId}/${exactProductId}/${orderId}`)
+                                    .then(response => {
+                                        let data = response.data.cancelled;
+                                        if (data) {
+                                            status.innerHTML = 'Cancelled';
+                                            document.getElementById(`cancelBtn-${productIndex}`).remove()
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error cancelling order:', error);
+                                    });
+
+                            }
                         } else {
                             console.error(`Element with id orderStatus-${productIndex} not found.`);
                         }

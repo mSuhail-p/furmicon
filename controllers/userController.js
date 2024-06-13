@@ -7,6 +7,7 @@ const Category = require('../model/category')
 const userAddress = require('../model/Address')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const Wallet = require('../model/walletModel')
 
 
 
@@ -174,7 +175,6 @@ const insertUser = async (req, res) => {
             })
 
 
-
             const userdata = await user.save();
             if (userdata) {
 
@@ -203,9 +203,6 @@ const insertUser = async (req, res) => {
 
         }
 
-
-
-
     } catch (error) {
         console.log(error)
     }
@@ -233,10 +230,8 @@ const verifiedLogin = async (req, res) => {
                     const passwordMatch = await bcrypt.compare(password, userdata.password);
 
                     if (passwordMatch) {
-                        console.log("it is one");
-                        console.log(passwordMatch);
-                        console.log("it is two");
                         req.session.user_id = userdata._id;
+
                         // req.session.user_id
                         console.log("is is session code " + req.session.user_id)
                         res.redirect('/home')
@@ -399,7 +394,6 @@ const verifyMail = async (req, res) => {
 
 
         const otpverify = await OTP.findOne({ email: req.session.email });
-        console.log(otpverify, 'it is otpverify')
 
         // console.log("it is second" + otpverify.otp);
         // console.log("it is third" + req.body.otp);
@@ -408,6 +402,18 @@ const verifyMail = async (req, res) => {
             if (otpverify.otp == req.body.otp) {
                 const updateInfo = await User.updateOne({ email: req.session.email }, { $set: { is_verified: 1 } })
                 if (updateInfo) {
+
+                    const userData = await User.findOne({ email: req.session.email })
+                    console.log(userData._id, 'it is data')
+
+                    //CREATING WALLET
+                    let createWallet = new Wallet({
+                        balance: 0,
+                        userId: userData._id,
+                    })
+                    await createWallet.save()
+
+
                     //user has to login for enter to home  page
                     res.render('user/login.ejs', { afterOtp: 'Please Login' })
                 }
@@ -446,27 +452,59 @@ const verifyMail = async (req, res) => {
 const shopProduct = async (req, res) => {
     try {
 
-        // const userData = await User.findOne({_id:req.session.user_id});
-        // console.log(userData+"it is from shop")
+        const productsFinding = await Product.find({}).populate({
+            path: 'category',
+            populate: {
+                path: 'offer'
+            }
+        }).populate('offer')
+
+
+        for (const element of productsFinding) {
+
+            if (element.offer && element.category.offer) {
+
+                let largeOffer = Math.max(element.offer.offPercentage, element.category.offer.offPercentage);
+                let offerPrice = element.price - (largeOffer / 100) * element.price
+                console.log(offerPrice, 'it is offer price')
+                let addOfferPrice = await Product.updateOne({ _id: element._id }, { $set: { offerPrice: offerPrice } })
+
+            } else if (element.offer) {
+                let offerPrice = parseInt(element.price - (element.offer.offPercentage / 100) * element.price)
+                console.log(offerPrice, 'it is offer only')
+                await Product.updateOne({ _id: element._id }, { $set: { offerPrice: offerPrice } })
+
+            } else if (element.category.offer) {
+                let offerPrice = parseInt(element.price - (element.category.offer.offPercentage / 100) * element.price)
+                console.log(offerPrice, 'it is category offer only')
+                await Product.updateOne({ _id: element._id }, { $set: { offerPrice: offerPrice } })
+            } else {
+                await Product.updateOne({ _id: element._id }, { $set: { offerPrice: element.price } })
+            }
+        }
 
 
 
 
-        const productsFinding = await Product.find({}).populate('category')
-        // console.log(productsFinding[0].category._id); 
-
-        console.log(productsFinding + "it cheching of the category")
-        const products = productsFinding.filter((element) => {
+        const filterdProducts = productsFinding.filter((element) => {
             return element.category.status === true && element.is_blocked === 1;
         })
 
-        // console.log("products " + products)
 
-        // console.log(products)
 
-        console.log("shop is working")
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
 
-        res.render('user/shop.ejs', { products });
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
+        const products = filterdProducts.slice(startIndex, endIndex);
+        const length = filterdProducts.length
+
+
+
+
+        res.render('user/shop.ejs', { products, length });
 
 
 
@@ -477,6 +515,50 @@ const shopProduct = async (req, res) => {
 
     }
 }
+
+
+
+const searchProduct = async (req, res) => {
+    try {
+
+        let searchString = req.query.search
+        if (!searchString) {
+            return res.status(400).json({ error: 'Search string is required' });
+        }
+
+        let searchNumber = parseInt(searchString, 10);
+
+        let searchQuery = {
+            $or: [
+                { name: { $regex: new RegExp(searchString, 'i') } }
+            ]
+        };
+
+        if (!isNaN(searchNumber)) {
+            searchQuery.$or.push({ offerPrice: { $lt: searchNumber } });
+        }
+
+        let products = await Product.find(searchQuery).sort({ offerPrice: -1 }).populate({
+            path: 'category',
+            populate: {
+                path: 'offer'
+            }
+        }).populate('offer')
+        res.render('user/shop', { products, searchString })
+
+
+
+
+
+    } catch (error) {
+
+        console.log('error rendering search Products:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the search Products.' })
+
+    }
+}
+
+
 
 
 const sortProduct = async (req, res) => {
@@ -545,8 +627,18 @@ const productDetails = async (req, res) => {
 
 
         let UserId = req.session.user_id
-        const product = await Product.findOne({ _id: product_id }).populate('category');
-        const related = await Product.find({ category: product.category._id }).populate('category')
+        const product = await Product.findOne({ _id: product_id }).populate({
+            path: 'category',
+            populate: {
+                path: 'offer'
+            }
+        })
+
+
+        console.log(product.price, product?.offer?.offPercentage, 'ifjsdkfl')
+
+
+        let related = await Product.find({ category: product.category._id }).populate('category')
         console.log("..........." + related + "it is related ")
 
         console.log(product.images[1] + "it is images");
@@ -624,6 +716,11 @@ let viewWishlist = async (req, res) => {
         res.status(500).render('error', { error: 'An error occurred while rendering the wishlist.' });
     }
 }
+
+
+
+
+
 
 
 let userProfile = async (req, res) => {
@@ -859,7 +956,7 @@ const getOrder = async (req, res) => {
         const orders = await Orders.find({ userId: user_id }).populate({
             path: 'orderedProducts.productId',
             model: 'Product'
-        }).sort({purchasedDate:-1})
+        }).sort({ orderedTime: -1 })
 
         res.render('user/orderHistory', { orders })
 
@@ -877,9 +974,20 @@ const getOrder = async (req, res) => {
 
 let cancelOrder = async (req, res) => {
     try {
-        const { productId } = req.params
-        const { exactProductId } = req.params
+        const { productId, exactProductId, orderId } = req.params
         const { user_id } = req.session
+        let orderToCancel = await Orders.findOne({ _id: orderId })
+        // const userWallet = await Wallet.findOne({ userId: user_id })
+        const product = await Product.findOne({ _id: exactProductId })
+        console.log(product.offerPrice, 'it is offerprice')
+
+        if (orderToCancel.paymentMethod == 'Online Payment' || orderToCancel.paymentMethod == 'Wallet') {
+            console.log('insid the reached')
+           await Wallet.updateOne(
+                { userId: user_id },
+                { $inc: { balance: product.offerPrice } }
+            );
+        }
 
         let cancel = await Orders.updateOne(
             { userId: user_id, "orderedProducts._id": productId },
@@ -887,6 +995,9 @@ let cancelOrder = async (req, res) => {
                 $set: { "orderedProducts.$.status": "Cancelled" }
             }
         );
+
+
+
 
         await Product.updateOne({ _id: exactProductId }, { $inc: { quantity: 1 } })
         console.log(cancel)
@@ -973,6 +1084,7 @@ module.exports = {
     insertUser,
     verifyMail,
     shopProduct,
+    searchProduct,
     sortProduct,
     loadRegister,
     resendOtp,

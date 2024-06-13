@@ -11,6 +11,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         .error {
             color: red;
@@ -26,65 +27,220 @@
 <body style="background: rgb(81, 79, 79);">
     <div class="container bg-white w-50 rounded rounded-4 mt-5">
         <h2>Edit Product</h2>
-        <% if (typeof sendToEdit != 'undefined') { %>
-        <form action="/admin/edit_product/<%= sendToEdit._id %>" method="POST" id="productForm" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" value="<%= sendToEdit.name %>" class="form-control" id="name" name="name">
-                <div id="nameError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <select class="form-control" id="category" name="category">
-                    <option value="<%= sendToEdit.category._id %>"><%= sendToEdit.category.name %></option>
-                    <% categories.forEach(element => { %>
-                        <option value="<%= element._id %>"><%= element.name %></option>
-                    <% }) %>
-                </select>
-                <div id="categoryError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="number" value="<%= sendToEdit.price %>" class="form-control" id="price" name="price">
-                <div id="priceError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <label for="quantity">Quantity:</label>
-                <input type="number" value="<%= sendToEdit.quantity %>" class="form-control" id="quantity" name="quantity">
-                <div id="quantityError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <label for="existingImages">Existing Images:</label>
-                <div id="existingImages" class="d-flex flex-wrap">
-                    <% if (sendToEdit.images && sendToEdit.images.length > 0) { %>
-                        <% sendToEdit.images.forEach((image, index) => { %>
-                            <div class="existing-image-wrapper position-relative m-2">
-                                <img class="img-fluid img-thumbnail" src="/userimages/<%= image %>" alt="Existing Image" id="existingImage-<%= index %>">
-                                <input type="hidden" name="existingImages[]" value="<%= image %>">
-                                <button type="button" class="btn btn-primary btn-sm edit-image mt-2" data-index="<%= index %>">Change</button>
-                            </div>
-                        <% }) %>
-                    <% } %>
+        <% if (typeof sendToEdit !='undefined' ) { %>
+            <form action="/admin/edit_product/<%= sendToEdit._id %>" method="POST" id="productForm"
+                enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" value="<%= sendToEdit.name %>" class="form-control" id="name" name="name">
+                    <div id="nameError" class="error"></div>
                 </div>
-            </div>
-            <div class="form-group" id="newImagesContainer">
-                <label for="images">New Images:</label>
-                <input class="btn border rounded" type="file" class="form-control" id="images" name="images[]" multiple accept="image/*">
-                <div id="imagesError" class="error"></div>
-                <div id="imagePreview" class="mt-3"></div>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea class="form-control" id="description" name="description" rows="3"><%= sendToEdit.description %></textarea>
-                <div id="descriptionError" class="error"></div>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        <% } %>
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select class="form-control" id="category" name="category">
+                        <option value="<%= sendToEdit.category._id %>">
+                            <%= sendToEdit.category.name %>
+                        </option>
+                        <% categories.forEach(element=> { %>
+                            <option value="<%= element._id %>">
+                                <%= element.name %>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <div id="categoryError" class="error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="number" value="<%= sendToEdit.price %>" class="form-control" id="price" name="price">
+                    <div id="priceError" class="error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" value="<%= sendToEdit.quantity %>" class="form-control" id="quantity"
+                        name="quantity">
+                    <div id="quantityError" class="error"></div>
+                </div>
+
+
+                <div class="y mb-4">
+                    <label for="offer">New Offer :</label>
+                    <% if (offer.length> 0) { %>
+                        <button type="button" onclick="modalOpen(<%= JSON.stringify(offer) %>,'<%=sendToEdit._id%>')"
+                            class="btn btn-primary" id="openModalButton" data-toggle="modal"
+                            data-target="#exampleModal">
+                            Click here
+                        </button>
+                        <% } %>
+
+                </div>
+                <% if( typeof sendToEdit.offer !='undefined' ){ %>
+
+
+                    <div class="container mb-3 mt-3 ">
+                        <div class="row">
+                            <div class="col-md-6 mx-auto">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-center">
+                                            <%=sendToEdit.offer.offerName%>
+                                        </h3>
+                                        <h1 class="text-center" style="font-size: 60px;">
+                                            <%=sendToEdit.offer.offPercentage %>%
+                                        </h1>
+                                        <h5 class="card-title text-center">
+                                            <%=sendToEdit.offer.description%>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% } %>
+
+
+                        <div class="form-group">
+                            <label for="existingImages">Existing Images:</label>
+                            <div id="existingImages" class="d-flex flex-wrap">
+                                <% if (sendToEdit.images && sendToEdit.images.length> 0) { %>
+                                    <% sendToEdit.images.forEach((image, index)=> { %>
+                                        <div class="existing-image-wrapper position-relative m-2">
+                                            <img class="img-fluid img-thumbnail" src="/userimages/<%= image %>"
+                                                alt="Existing Image" id="existingImage-<%= index %>">
+                                            <input type="hidden" name="existingImages[]" value="<%= image %>">
+                                            <button type="button" class="btn btn-primary btn-sm edit-image mt-2"
+                                                data-index="<%= index %>">Change</button>
+                                        </div>
+                                        <% }) %>
+                                            <% } %>
+                            </div>
+                        </div>
+                        <div class="form-group" id="newImagesContainer">
+                            <label for="images">New Images:</label>
+                            <input class="btn border rounded" type="file" class="form-control" id="images"
+                                name="images[]" multiple accept="image/*">
+                            <div id="imagesError" class="error"></div>
+                            <div id="imagePreview" class="mt-3"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea class="form-control" id="description" name="description"
+                                rows="3"><%= sendToEdit.description %></textarea>
+                            <div id="descriptionError" class="error"></div>
+                        </div>
+                        <input type="hidden" value="<%=sendToEdit._id%>" id="elementId">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <% } %>
     </div>
 
+
+    <!-- Offer modal starts form here -->
+
+
+
+    <!-- The Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select an Offer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Dynamic content will be added here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveButton">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
     <script>
-        $(document).ready(function() {
+        // document.addEventListener('DOMContentLoaded', function () {
+        function modalOpen(offer, productId) {
+
+            console.log('offer[1].offerName')
+            const openModalButton = document.getElementById('openModalButton');
+            const modalBody = document.getElementById('modalBody');
+            const saveButton = document.getElementById('saveButton');
+            const currentproduct = document.getElementById('elementId').value
+
+            console.log('offfdsafdasdfdsf')
+
+            // Add an event listener to the button to populate the modal
+            // openModalButton.addEventListener('click', function () {
+            // Clear the modal body first
+            modalBody.innerHTML = '';
+
+            console.log('item.offerName')
+
+            // Populate the modal with cards
+            offer.forEach((item, index) => {
+                console.log(item.offerName)
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${item.offerName}</h5>
+                            <p class="card-text">${item.offPercentage}% off</p>
+                            <input type="checkbox" name="options" value="${item._id}" class="single-checkbox">
+                        </div>
+                    `;
+                modalBody.appendChild(card);
+            });
+
+            // Ensure only one checkbox is selected at a time
+            const checkboxes = modalBody.querySelectorAll('.single-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    checkboxes.forEach(box => {
+                        if (box !== this) box.checked = false;
+                    });
+                });
+            });
+            // });
+
+            // Handle the save button click
+            saveButton.addEventListener('click', function () {
+                const selectedCheckbox = document.querySelector('.single-checkbox:checked');
+                if (selectedCheckbox) {
+                    const selectedValue = selectedCheckbox.value;
+                    console.log(selectedValue, 'it is selected')
+                    console.log('Selected value:', selectedValue);
+
+
+                    axios.patch(`/admin/saveOffer/${selectedValue}/${productId}`)
+                        .then(Response => {
+                            if (Response.data.status) {
+                                window.location.reload()
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                } else {
+                    console.log('No option selected.');
+                }
+                $('#exampleModal').modal('hide'); // Hide the modal
+            });
+
+        }
+        // });
+    </script>
+
+
+
+    <script>
+        $(document).ready(function () {
             var croppies = [];
             var fileCount = 0;
             var isNewImages = false;
@@ -95,7 +251,7 @@
                 croppies = []; // Reset croppies array
             }
 
-            $('#images').on('change', function(event) {
+            $('#images').on('change', function (event) {
                 var files = event.target.files;
                 updateImagePreview();
 
@@ -113,7 +269,7 @@
                     }
 
                     var reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         var img = $('<img>').attr('src', e.target.result).addClass('img-thumbnail mr-2 mb-2');
                         $('#imagePreview').append(img);
 
@@ -146,7 +302,7 @@
                 $('#' + elementId).text('');
             }
 
-            $('#productForm').on('submit', function(event) {
+            $('#productForm').on('submit', function (event) {
                 event.preventDefault();
 
                 var valid = true;
@@ -211,7 +367,7 @@
                     formData.append('quantity', quantity);
                     formData.append('description', description);
 
-                    $('input[name="existingImages[]"]').each(function() {
+                    $('input[name="existingImages[]"]').each(function () {
                         formData.append('existingImages[]', $(this).val());
                     });
 
@@ -219,13 +375,13 @@
                         var croppedImages = [];
                         var processedCount = 0;
 
-                        croppies.forEach(function(croppie, index) {
-                            croppie.result('blob').then(function(blob) {
+                        croppies.forEach(function (croppie, index) {
+                            croppie.result('blob').then(function (blob) {
                                 croppedImages.push(blob);
                                 processedCount++;
 
                                 if (processedCount === croppies.length) {
-                                    croppedImages.forEach(function(croppedImage, index) {
+                                    croppedImages.forEach(function (croppedImage, index) {
                                         formData.append('croppedImages[]', croppedImage, 'image' + index + '.png');
                                     });
 
@@ -246,17 +402,17 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function(response) {
-                        
+                    success: function (response) {
+
                         window.location.href = '/admin/product'
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         alert('Error updating product: ' + errorThrown);
                     }
                 });
             }
 
-            $(document).on('click', '.edit-image', function() {
+            $(document).on('click', '.edit-image', function () {
                 var index = $(this).data('index');
                 var existingImage = $('#existingImage-' + index);
                 var img = $('<img>').attr('src', existingImage.attr('src')).addClass('img-thumbnail mr-2 mb-2');
@@ -266,9 +422,9 @@
                     showZoomer: true
                 });
 
-                croppie.result('blob').then(function(blob) {
+                croppie.result('blob').then(function (blob) {
                     var reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         existingImage.attr('src', e.target.result);
                         $('input[name="existingImages[]"]').eq(index).val(e.target.result);
                     };

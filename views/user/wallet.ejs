@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #333;
+            color: #fff;
+            padding: 2rem;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .sidebar-nav {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #444;
+        }
+
+        .sidebar-nav a.active {
+            background-color: #007bff;
+        }
+
+        .sidebar-nav a i {
+            margin-right: 0.5rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 2rem;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+    </style>
+
+    <style>
+        .wallet-card {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .wallet-header {
+            padding: 1.5rem;
+        }
+
+        .wallet-balance {
+            font-size: 1.2rem;
+        }
+
+        .table-responsive {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <style>
+        .navbar-nav .nav-item+.nav-item {
+            margin-left: 20px;
+            /* Adjust the value as needed */
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <h4>Menu</h4>
+                <ul class="sidebar-nav">
+                    <li><a href="/userProfile"><i class="fas fa-user"></i>Profile</a></li>
+                    <li><a href="/userAddress"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                    <li><a href="/getOrder"><i class="fas fa-shopping-cart"></i>Orders</a></li>
+                    <li><a href="/changePassword" class=""><i class="fas fa-key"></i>Change Password</a></li>
+                    <li><a href="/getWallet" class="active "><i class="fas fa-key"></i>Wallet</a></li>
+                    <li><a href="#" id="signOutButton"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                </ul>
+            </div>
+
+
+            <!-- ........................... -->
+
+            <div class="wallet-container container w-50 mt-5">
+                <div class="card wallet-card shadow-lg">
+                    <div class="card-header wallet-header bg-primary text-white">
+                        <h1 class="mb-0 text-center">My Wallet</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="wallet-balance d-flex justify-content-between mb-4">
+                            <h5 class="mb-0">Balance:</h5>
+                            <% if(typeof userWallet !='undefined' ) { %>
+
+
+                                <h4 class="mb-0">₹<span id="walletBalance">
+                                        <%= userWallet.balance %>
+                                    </span></h4>
+
+                                <% } %>
+                        </div>
+                        <div class="wallet-history">
+                            <button class="btn btn-outline-primary btn-block" type="button" data-toggle="collapse"
+                                data-target="#transactionHistory" aria-expanded="false"
+                                aria-controls="transactionHistory">
+                                <i class="fas fa-history mr-2"></i> View Transaction History
+                            </button>
+                            <div class="collapse table-responsive" id="transactionHistory">
+                                <table class="table table-hover mt-3">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Transaction history will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+            <script>
+                // Simulated transaction history data
+                const transactions = [
+                    { date: '2024-06-10', description: 'Order #1234', amount: -1500 },
+                    { date: '2024-06-09', description: 'Refund #4321', amount: 1500 },
+                    { date: '2024-06-08', description: 'Order #5678', amount: -2000 }
+                ];
+
+                // Populate transaction history
+                const transactionHistory = document.querySelector('#transactionHistory tbody');
+                transactions.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${transaction.date}</td>
+                        <td>${transaction.description}</td>
+                        <td>${transaction.amount < 0 ? '-' : ''}₹${Math.abs(transaction.amount)}</td>
+                    `;
+                    transactionHistory.appendChild(row);
+                });
+            </script>
+
+            <!-- .................................. -->
+
+
+
+        </div>
+    </div>
+    </div>
+    </div>
+
+
+
+
+
+    </div>
+    </div>
+
+
+
+</body>
+
+</html>

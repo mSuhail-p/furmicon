@@ -6,6 +6,7 @@ const path = require('path');
 const adminController = require('../controllers/adminController')
 const productController = require('../controllers/productController')
 const orderController = require('../controllers/orderController')
+const offerContoller = require('../controllers/offerController')
 const adminAuth =require('../middleware/adminauth')
 const upload = require('../middleware/uploadImage')
 
@@ -41,6 +42,7 @@ router.get('/product',adminAuth.is_login,productController.loadproduct);
 router.get('/blockProduct/:product_id',productController.blockProduct);
 router.get('/edit_product/:editProduct',adminAuth.is_login,productController.editProductLoad)
 router.post('/edit_product/:productId', upload.array('croppedImages[]'), productController.edit_product);
+router.patch('/saveOffer/:offerId/:productId',productController.saveOffer)
 
 
 //ORDERS
@@ -60,6 +62,15 @@ router.post('/addCategory',adminController.addCategory)
 router.get('/editCategory/:categoryId',adminController.editCategoryLoad);
 router.put('/editingCategory/:catergory_id',adminController.editingCategory)
 router.get('/deleteCategory/:category',adminController.deleteCategory)
+router.patch('/saveCategoryOffer/:catOfferId/:categoryId',adminController.saveCategoryOffer)
+
+
+
+//OFFER
+router.get('/offer',offerContoller.getOffer)
+router.post('/addOffer',offerContoller.addOffer)
+router.delete('/deleteOffer/:offerId',offerContoller.deleteOffer)
+ 
 
   
 

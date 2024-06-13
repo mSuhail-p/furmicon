@@ -73,7 +73,6 @@
                                 <ul>
                                     <li><a href="tel:#"><i class="icon-phone"></i>Call: +9400981702</a></li>
                                     <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist
-                                            <span>(3)</span></a></li>
 
 
                                 </ul>
@@ -130,15 +129,17 @@
                         <div class="header-search">
                             <a href="#" class="search-toggle" role="button" title="Search"><i
                                     class="icon-search"></i></a>
-                            <form action="#" method="get">
+                            <form action="/searchProducts" method="get">
                                 <div class="header-search-wrapper">
                                     <label for="q" class="sr-only">Search</label>
-                                    <input type="search" class="form-control" name="q" id="q" placeholder="Search in..."
-                                        required>
+                                    <input type="search" class="form-control"
+                                        value="<%= typeof searchString !== 'undefined'? searchString : '' %>"
+                                        name="search" id="q" placeholder="Search in..." required>
                                 </div><!-- End .header-search-wrapper -->
                             </form>
                         </div><!-- End .header-search -->
 
+ 
                         <style>
                             /* Custom CSS to increase the icon size */
                             .icon-user {
@@ -278,14 +279,17 @@
                                                 <div class="products mb-3">
                                                     <div class="product product-7 text-center">
                                                         <figure class="product-media">
-                                                            <% if(elements.quantity>0){ %>
+                                                            <% if(elements.quantity<1){ %>
+                                                                <span style="background: rgb(222, 1, 1);"
+                                                                    class="outofstock product-label label-new">Out
+                                                                    of
+                                                                    stock</span>
 
-                                                                <span class="product-label label-new">New</span>
-                                                                <% }else{ %>
-                                                                    <span style="background: rgb(222, 1, 1);"
-                                                                        class="outofstock product-label label-new">Out
-                                                                        of
-                                                                        stock</span>
+
+                                                                <% }else if(elements.offer || elements.category.offer){
+                                                                    %>
+                                                                    <span class="product-label label-new">OFFER</span>
+
                                                                     <% } %>
                                                                         <!-- <a href="/details"> -->
                                                                         <a href="/details/<%= elements._id %>">
@@ -297,16 +301,10 @@
                                                                         </a>
 
                                                                         <div class="product-action-vertical">
-                                                                            <a href="#"
+                                                                            <a href="/addToWishlist/<%= elements._id %>"
                                                                                 class="btn-product-icon btn-wishlist btn-expandable"><span>add
                                                                                     to wishlist</span></a>
-                                                                            <a href="popup/quickView.html"
-                                                                                class="btn-product-icon btn-quickview"
-                                                                                title="Quick view"><span>Quick
-                                                                                    view</span></a>
-                                                                            <a href="#"
-                                                                                class="btn-product-icon btn-compare"
-                                                                                title="Compare"><span>Compare</span></a>
+
                                                                         </div><!-- End .product-action-vertical -->
 
                                                                         <div class="product-action">
@@ -327,9 +325,24 @@
                                                             <h3 class="product-title"><a href="product.html">
                                                                     <%= elements.name %>
                                                                 </a></h3><!-- End .product-title -->
-                                                            <div class="product-price">
-                                                                ₹ <%= elements.price %>
+
+
+
+
+
+                                                            <div class="product-price  ">
+
+                                                                <% if(elements.offer || elements.category.offer){ %>
+                                                                    <span class="old-price">₹ <%=elements.price%></span>
+
+                                                                    <% } %>
+                                                                        <span>₹ <%=elements.offerPrice%></span>
+
                                                             </div><!-- End .product-price -->
+
+
+
+
                                                             <div class="ratings-container">
                                                                 <div class="ratings">
                                                                     <div class="ratings-val" style="width: 20%;"></div>
@@ -372,18 +385,29 @@
                                                                     class="icon-long-arrow-left"></i></span>Prev
                                                         </a>
                                                     </li>
-                                                    <li class="page-item active" aria-current="page"><a
-                                                            class="page-link" href="#">1</a>
-                                                    </li>
-                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                    <% if(typeof length !='undefined' ){ %>
+
+
+                                                        <% for(let i=1;i<length/4;i++){ %>
+
+                                                            <li class="page-item active" aria-current="page"><a
+                                                                    class="page-link" href="/shop?page=<%=i%>">
+                                                                    <%=i%>
+                                                                </a>
+                                                            </li>
+                                                            <% } %>
+
+                                                                <% } %>
+                                                                    <!-- <li class="page-item"><a class="page-link" href="#">2</a></li>
                                                     <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                    <li class="page-item-total">of 6</li>
-                                                    <li class="page-item">
-                                                        <a class="page-link page-link-next" href="#" aria-label="Next">
-                                                            Next <span aria-hidden="true"><i
-                                                                    class="icon-long-arrow-right"></i></span>
-                                                        </a>
-                                                    </li>
+                                                    <li class="page-item-total">of 6</li> -->
+                                                                    <li class="page-item">
+                                                                        <a class="page-link page-link-next" href="#"
+                                                                            aria-label="Next">
+                                                                            Next <span aria-hidden="true"><i
+                                                                                    class="icon-long-arrow-right"></i></span>
+                                                                        </a>
+                                                                    </li>
                                                 </ul>
                                             </nav>
                         </div><!-- End .col-lg-9 -->

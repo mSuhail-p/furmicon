@@ -91,9 +91,9 @@
                             </form>
                         </div><!-- End .header-search -->
 
-                        <a href="wishlist.html" class="wishlist-link">
+                        <a href="/wishlist" class="wishlist-link">
                             <i class="icon-heart-o"></i>
-                            <span class="wishlist-count">3</span>
+
                         </a>
 
                         <div class="dropdown cart-dropdown">
@@ -391,7 +391,7 @@
                                                     </a>
 
                                                     <div class="product-action-vertical">
-                                                        <a href="#"
+                                                        <a href="/addToWishlist/<%= element._id %>"
                                                             class="btn-product-icon btn-wishlist btn-expandable"><span>add
                                                                 to
                                                                 wishlist</span></a>
@@ -403,7 +403,7 @@
                                     <div class="product-body">
                                         <h3 class="product-title text-warning">
                                             <%=element.category.name%>
-                                       </h3>
+                                        </h3>
                                         <h3 class="product-title"><a href="/details/<%= element._id %>">
                                                 <%=element.name%>
                                             </a></h3>
@@ -437,8 +437,17 @@
     </div><!-- End .products-container -->
     </div><!-- End .container -->
 
-    
+
     </main><!-- End .main -->
+
+
+
+  
+
+
+
+
+
 
     <footer class="footer footer-2">
         <div class="footer-bottom">

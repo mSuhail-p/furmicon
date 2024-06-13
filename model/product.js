@@ -30,6 +30,14 @@ const productSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    offerPrice:{
+        type:Number,
+        required:false
+    },
+    offer:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Offers'
+    },
     is_blocked:{
         type:Number,
         default:0

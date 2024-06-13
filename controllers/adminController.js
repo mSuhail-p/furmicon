@@ -1,7 +1,7 @@
 const Admin = require('../model/Admin')
 const User = require('../model/userModel')
 const Category = require('../model/category');
-//  ddddd= require('../model/product');
+const offer = require('../model/OfferModel')
 
 
 const bcrypt = require('bcrypt')
@@ -153,12 +153,14 @@ const addCategory = async (req, res) => {
 const loadCategory = async (req, res) => {
     try {
 
-        const allCategory = await Category.find({});
+        const allCategory = await Category.find({}).populate('offer')
+        const categoryOffer = await offer.find({type:'category'})
+
 
 
         // const checking = Category.find({status:false})
 
-        res.render('admin/category', { allCategory });
+        res.render('admin/category', { allCategory,categoryOffer });
 
 
 
@@ -207,15 +209,46 @@ const editCategoryLoad = async (req, res) => {
     try {
 
         const { categoryId } = req.params
-        const editCategory = await Category.findOne({ _id: categoryId })
+        const editCategory = await Category.findOne({ _id: categoryId }).populate('offer')
+        const categoryOffer = await offer.find({type:'category'})
 
 
-        res.render('admin/editCategory', { editCategory })
+        res.render('admin/editCategory', { editCategory,categoryOffer })
 
     } catch (error) {
         console.log(error)
     }
 }
+
+
+const saveCategoryOffer= async (req, res) => {
+    try {
+
+        const { catOfferId } = req.params
+        const { categoryId } = req.params
+
+        // const selectedOffer = await Offer.findOne({ _id: offerId })
+        // const offeredCategory = await Product.findOne({ _id: productId })
+        // let offerPrice = offeredProduct.price - (selectedOffer.offPercentage / 100) * offeredProduct.price
+        let addOffer = await Category.findOneAndUpdate({ _id: categoryId }, { $set: { offer: catOfferId} })
+        console.log(addOffer, 'it is addoffer')
+
+        res.json({status:true})
+
+
+
+
+
+
+    } catch (error) {
+
+        console.log('an error rendering saveOffer:', error)
+    }
+}
+
+
+
+
 
 
 
@@ -316,6 +349,7 @@ module.exports = {
     loadCategory,
     addCategory,
     editCategoryLoad,
+    saveCategoryOffer,
     deleteCategory,
     editingCategory,
     logout

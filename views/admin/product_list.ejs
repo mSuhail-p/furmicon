@@ -75,6 +75,18 @@
                     </a>
 
                 </li>
+
+
+                <li class="menu-item  ">
+                    <a class="menu-link" href="/admin/offer">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Offer</span>
+                    </a>
+
+                </li>
+
+
+
                 <li class="menu-item  ">
                     <a class="menu-link" href="#" id="signOutButton">
                         <i i class="icon material-icons md-add_box"></i>
@@ -292,7 +304,8 @@
                                     <th>Price</th>
                                     <th>Quantity</th>
                                     <th>Images</th>
-                                    <!-- <th>Description</th> -->
+                                    <th>Offer</th>
+                                    <th>Offer Price</th>
                                     <!-- <th>Date</th> -->
                                     <th>Actions</th>
                                 </tr>
@@ -334,25 +347,59 @@
                                                         <!-- <img src="assets/imgs/theme/flag-fr.png" alt="Image 2" class="rounded bg-dark ">
                                         <img src="assets/imgs/theme/flag-fr.png" alt="Image 3" class="rounded bg-dark "> -->
                                             </td>
-                                            <!-- <td class="text-ellipsis">
+                                            <% if(liproduct[i].offer){%>
+                                                <td class="text-danger">
+                                                    <%= liproduct[i].offer.offPercentage%> %
+
+                                                </td>
+                                                <%}else{ %>
+                                                    <td>
+                                                        No Offer
+                                                    </td>
+
+                                                    <% } %>
+
+
+
+                                                        </td>
+                                                        <% if(liproduct[i].offer){%>
+                                                            <td class="text-danger">
+                                                                <%=liproduct[i].offerPrice%>
+            
+                                                            </td>
+                                                            <%}else{ %>
+                                                                <td>
+                                                                    No Offer
+                                                                </td>
+            
+                                                                <% } %>
+            
+            
+            
+                                                                    </td>
+
+                                                                    <!-- <td class="text-ellipsis">
                                         <%= liproduct[i].description %>
                                     </td> -->
-                                            <!-- <td>
+                                                                    <!-- <td>
                                         <%= liproduct[i].date %>
                                     </td> -->
 
-                                            <td>
+                                                                    <td>
 
 
-                                                <button
-                                                    onclick="window.location.href='/admin/edit_product/<%= liproduct[i]._id %>';"
-                                                    class="btn btn-sm edit-btn">Edit</button>
-                                                <button onclick="listingProduct('<%= liproduct[i]._id %>','<%=i %>')"
-                                                    id="productid_<%= i %>" class="btn btn-sm delete-btn">
-                                                    <%= liproduct[i].is_blocked==0 ?'List':'Unlist' %>
-                                                </button>
+                                                                        <button
+                                                                            onclick="window.location.href='/admin/edit_product/<%= liproduct[i]._id %>';"
+                                                                            class="btn btn-sm edit-btn">Edit</button>
+                                                                        <button
+                                                                            onclick="listingProduct('<%= liproduct[i]._id %>','<%=i %>')"
+                                                                            id="productid_<%= i %>"
+                                                                            class="btn btn-sm delete-btn">
+                                                                            <%= liproduct[i].is_blocked==0
+                                                                                ?'List':'Unlist' %>
+                                                                        </button>
 
-                                            </td>
+                                                                    </td>
                                         </tr>
                                         <% } %>
                                             <% } %>
@@ -367,7 +414,7 @@
                         // Loop through each element
                         for (let element of nameElements) {
                             // Check if the length of innerText is greater than 4
-                            if (element.innerText.length >20) {
+                            if (element.innerText.length > 20) {
                                 // Get the current text content
                                 let name = element.innerText;
 
