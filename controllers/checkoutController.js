@@ -224,8 +224,18 @@ let placeOrder = async (req, res) => {
 
             async function orderPlacing(orderId) {
 
-                let wallet = await Wallet.updateOne({ userId: user_id }, { $inc: { balance: -subTotal } })
-                console.log(wallet, ' it is wallet completion')
+                let wallet = await Wallet.updateOne({ userId: user_id }, {
+                    $inc: { balance: -subTotal },
+                    $push: {
+                        history: {
+                            Date: new Date().toDateString(),
+                            Description: 'Product ordered',
+                            Amount: `- ${subTotal}`,
+                            time: new Date()
+                        }
+                    }
+                })
+
 
 
                 for (const item of productItems) {

@@ -168,10 +168,14 @@
 
                                 <% } %>
                         </div>
+
+                        
+                        
                         <div class="wallet-history">
                             <button class="btn btn-outline-primary btn-block" type="button" data-toggle="collapse"
                                 data-target="#transactionHistory" aria-expanded="false"
                                 aria-controls="transactionHistory">
+
                                 <i class="fas fa-history mr-2"></i> View Transaction History
                             </button>
                             <div class="collapse table-responsive" id="transactionHistory">
@@ -198,12 +202,27 @@
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
             <script>
                 // Simulated transaction history data
-                const transactions = [
-                    { date: '2024-06-10', description: 'Order #1234', amount: -1500 },
-                    { date: '2024-06-09', description: 'Refund #4321', amount: 1500 },
-                    { date: '2024-06-08', description: 'Order #5678', amount: -2000 }
-                ];
+                console.log('it is walerrrrrrrrrrrr')
+                const userWallet = <%- JSON.stringify(userWallet) %>;
+               let b =  userWallet.history.sort((a, b) => new Date(a.time) - new Date(b.time));
+                console.log(b,'it is b')
 
+                // Initialize an array to accumulate transactions
+                console.log(userWallet.history[0].Data , userWallet.history[0].Description ,  userWallet.history[0].Am)
+
+
+                const transactions = [];
+
+                // Loop through each entry in the history and add to transactions array
+                userWallet.history.forEach((value) => {
+                    transactions.push({
+                        date: value.Date,
+                        description: value.Description,
+                        amount: value.Amount
+                    });
+                });
+
+                console.log(transactions); // Check the accumulated transactions
                 // Populate transaction history
                 const transactionHistory = document.querySelector('#transactionHistory tbody');
                 transactions.forEach(transaction => {
@@ -211,7 +230,7 @@
                     row.innerHTML = `
                         <td>${transaction.date}</td>
                         <td>${transaction.description}</td>
-                        <td>${transaction.amount < 0 ? '-' : ''}₹${Math.abs(transaction.amount)}</td>
+                        <td>${transaction.amount}</td>
                     `;
                     transactionHistory.appendChild(row);
                 });

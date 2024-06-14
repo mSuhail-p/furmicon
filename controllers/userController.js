@@ -983,10 +983,21 @@ let cancelOrder = async (req, res) => {
 
         if (orderToCancel.paymentMethod == 'Online Payment' || orderToCancel.paymentMethod == 'Wallet') {
             console.log('insid the reached')
-           await Wallet.updateOne(
+            await Wallet.updateOne(
                 { userId: user_id },
-                { $inc: { balance: product.offerPrice } }
+                {
+                    $inc: { balance: product.offerPrice },
+                    $push: {
+                        history: {
+                            Date: new Date().toDateString(),
+                            Description: `${product.name} cancelled`,
+                            Amount: `+ ${product.offerPrice}`,
+                            time: new Date()
+                        }
+                    }
+                }
             );
+
         }
 
         let cancel = await Orders.updateOne(
