@@ -15,6 +15,7 @@ const cartController  = require('../controllers/cartController')
 const checkoutController  = require('../controllers/checkoutController')
 const wishlistController = require('../controllers/wishlistController')
 const walletController = require('../controllers/walletController')
+const coupenController = require('../controllers/coupenController')
 
 router.get('/', auth.isAuthenticated, userController.loadHome)
 
@@ -72,6 +73,10 @@ router.get('/orderPlaced/:orderId',auth.cart,checkoutController.orderPlaced)
 router.post('/verifyPayment',auth.cart,checkoutController.verifyPayment)
 
 
+//Coupen
+router.get('/accessCoupon',coupenController.accessCoupen)
+
+
 
 //userProfile
 router.get('/userProfile',auth.authenticate,userController.userProfile)
@@ -85,6 +90,7 @@ router.get('/changePassword',userController.changePassword)
 router.post('/changePassword',userController.changinPassword)
 router.get('/getOrder',auth.authenticate,userController.getOrder)
 router.patch('/cancelOrder/:productId/:exactProductId/:orderId',userController.cancelOrder)
+router.patch('/returnProduct',userController.returnProduct)
 router.get('/signout',userController.signout)
 
 //WALLET

@@ -268,7 +268,14 @@
                                             onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
                                             class="btn btn-danger btn-sm"
                                             id="cancelBtn-<%=productIndex%>">Cancel</button>
-                                        <% } %>
+                                        <% }else if(product.status=='Delivered' ){ %>
+
+                                            <button
+                                                onclick="Return('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
+                                                class="btn btn-warning btn-sm"
+                                                id="returnBtn-<%=productIndex%>">Return</button>
+
+                                            <% } %>
 
                                 </td>
                             </tr>
@@ -288,7 +295,40 @@
 
             <script>
 
-                function cancel(productId, productIndex, orderIndex, exactProductId,orderId) {
+                function Return(productId, productIndex, orderIndex, exactProductId, orderId) {
+                    let status = document.getElementById(`orderStatus-${productIndex}-${orderIndex}`)
+                    Swal.fire({
+                        title: '"Please provide the reason for returning the product."',
+                        input: 'text',
+                        inputPlaceholder: 'Type your text here...',
+                        showCancelButton: true,
+                        confirmButtonText: 'OK',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const userInput = result.value;
+                            axios.patch(`/returnProduct/?reason=${userInput}&&orderId=${orderId}&&productId=${productId}`)
+                                .then(response => {
+                                    if(response.data.status){
+                                        status.innerHTML = 'Returned'
+                                        document.getElementById(`returnBtn-${productIndex}`).remove()
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log(error)
+                                })
+                        } else {
+                            console.log('Prompt was canceled');
+                        }
+                    });
+
+
+                }
+
+
+
+
+                function cancel(productId, productIndex, orderIndex, exactProductId, orderId) {
 
 
 

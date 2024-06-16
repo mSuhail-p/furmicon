@@ -33,6 +33,42 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
+
+<style>
+    #card {
+        border-radius: 10px;
+    }
+
+    #card-body {
+        padding: 1.5rem;
+    }
+
+    #card-title {
+        font-size: 2.25rem;
+        font-weight: bold;
+    }
+
+    .input-group .form-control {
+        font-size: 2.25rem;
+        font-weight: bold;
+        padding-right: 3rem;
+
+        background-color: #ffffff;
+
+    }
+
+    .btn-outline-secondary {
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+
+    #card-text {
+        font-size: 1rem;
+        color: #343a40;
+    }
+</style>
+
+
+
 <body>
     <div class="page-wrapper">
         <header class="header">
@@ -249,10 +285,11 @@
                 <div class="checkout">
                     <div class="container">
                         <div class="checkout-discount">
-                            <form action="#">
+                            <form id="takanCoupen">
                                 <input type="text" class="form-control" required id="checkout-discount-input">
                                 <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click
                                         here to enter your code</span></label>
+                                <input type="submit" id="coupenPass" hidden>
                             </form>
                         </div><!-- End .checkout-discount -->
 
@@ -386,7 +423,28 @@
 
                             </div><!-- End .col-lg-9 -->
                             <aside class="col-md-3">
+
+
+                                <div class="pb-2">
+                                    <% if(coupen.length>0){ %>
+
+
+                                        <button type="button" class="btn btn-primary rounded"
+                                            onclick="openModal(<%= JSON.stringify(coupen) %>)" id="openModalButton"
+                                            data-toggle="modal" data-target="#exampleModal">
+                                            Available Coupens
+                                        </button>
+
+                                        <% } %>
+
+                                </div>
+
                                 <div class="summary">
+
+
+
+
+
                                     <h3 class="summary-title">Your Order</h3><!-- End .summary-title -->
 
 
@@ -459,6 +517,85 @@
 
 
 
+
+        // <!-- The Modal -->
+        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content w-75">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Select an Coupen</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body  " id="modalBody">
+                        <!-- Dynamic content will be added here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveButton">Save</button>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <script>
+
+            function openModal(coupen) {
+                console.log(coupen)
+                console.log(coupen)
+
+                const openModalButton = document.getElementById('openModalButton');
+                const modalBody = document.getElementById('modalBody');
+                const saveButton = document.getElementById('saveButton');
+
+                modalBody.innerHTML = '';
+
+                console.log('item.offerName')
+
+                coupen.forEach((item, index) => {
+                    console.log(item.offerName)
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+<div class="card card-sm mb-3 shadow-sm">
+    <div class="card-body" id="card-body">
+        <h5 class="card-title text-center mb-3" id="card-title"  >${item.coupenName}</h5>
+        <div class="d-flex justify-content-center mb-3">
+            <div class="input-group input-group-sm w-75">
+                <input type="text" class="form-control text-center" value="${item.coupenCode}" id="coupon-code-${item._id}" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('${item.coupenCode}', 'coupon-code-${item._id}')">Copy</button>
+            </div>
+            <p class="card-text text-center font-weight-bold p-4" id="card-text" >${item.discountPercentage}% off</p>
+        </div>
+        <p class="card-text text-center font-weight-bold" id="cryteriaAmount" >MInimum purchase Amount : ₹${item.cryteriaAmount}</p>
+    </div>
+</div>
+                    `;
+                    modalBody.appendChild(card);
+                });
+
+
+            }
+
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Coupon code copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+
+
+
+
+        </script>
+
+
+
         <script>
             // Form validation and submission
             document.getElementById('newAddress').addEventListener('submit', function (event) {
@@ -511,7 +648,7 @@
             function selection(index) {
                 id = document.getElementById(`address-${index}`).value;
             }
-
+            let coupenId = undefined
             // Button for placing order
             document.getElementById('placeOrderButton').addEventListener('click', function (event) {
                 // event.preventDefault();
@@ -546,13 +683,14 @@
                     };
                     tableData.push(rowData);
                 }
-                console.log(tableData, 'it is table data');
+
+                console.log('it is formObjrct', Object.values(formObject).length)
 
                 // If id is undefined, new address will be taken
                 if (selectedPaymentMethod == 'Cash on delivery') {
-                    handleCashOnDelivery(id, formObject, tableData);
+                    handleCashOnDelivery(id, formObject, tableData, coupenId);
                 } else if (selectedPaymentMethod == 'Online Payment') {
-                    handleOnlinePayment(id, formObject, tableData);
+                    handleOnlinePayment(id, formObject, tableData, coupenId);
                 } else if (selectedPaymentMethod == 'wallet') {
                     if (parseInt(totalAmount) <= walletAmount) {
 
@@ -569,91 +707,133 @@
                 }
             });
 
-            function handleCashOnDelivery(id, formObject, tableData) {
-                if (id == undefined) {
-                    let dataToSend = {
-                        paymentMethod: 'Cash on delivery',
-                        tableData: tableData,
-                        formData: formObject,
-                    };
-                    console.log(dataToSend);
-                    axios.post('/placeOrder', dataToSend)
-                        .then(response => {
-                            const data = response.data.codSuccess;
-                            if (data) {
-                                window.location.href = `/orderPlaced/${response.data.orderId}`;
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
+            function handleCashOnDelivery(id, formObject, tableData, coupenId) {
+                if (id == undefined && Object.values(formObject).length == 0) {
+
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Address Selection Required',
+                        text: 'Please select an address before proceeding to checkout.',
+                        confirmButtonText: 'OK'
+                    });
+
                 } else {
-                    let dataToSend = {
-                        paymentMethod: 'Cash on delivery',
-                        tableData: tableData,
-                        addressId: id
-                    };
-                    axios.post('/placeOrder', dataToSend)
-                        .then(response => {
-                            const data = response.data.codSuccess;
-                            if (data) {
-                                window.location.href = `/orderPlaced/${response.data.orderId}`;
-                            } else {
-                                Swal.fire({
-                                    position: "top-end",
-                                    icon: "error",
-                                    title: "Currently this method is not working",
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
+
+
+
+                    if (id == undefined) {
+                        let dataToSend = {
+                            paymentMethod: 'Cash on delivery',
+                            tableData: tableData,
+                            formData: formObject,
+                            coupenId: coupenId
+
+                        };
+                        console.log(dataToSend);
+                        axios.post('/placeOrder', dataToSend)
+                            .then(response => {
+                                const data = response.data.codSuccess;
+                                if (data) {
+                                    window.location.href = `/orderPlaced/${response.data.orderId}`;
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    } else {
+                        let dataToSend = {
+                            paymentMethod: 'Cash on delivery',
+                            tableData: tableData,
+                            addressId: id,
+                            coupenId: coupenId
+
+                        };
+                        axios.post('/placeOrder', dataToSend)
+                            .then(response => {
+                                const data = response.data.codSuccess;
+                                if (data) {
+                                    window.location.href = `/orderPlaced/${response.data.orderId}`;
+                                } else {
+                                    Swal.fire({
+                                        position: "top-end",
+                                        icon: "error",
+                                        title: "Currently this method is not working",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    }
                 }
             }
 
-            function handleOnlinePayment(id, formObject, tableData) {
-                if (id == undefined) {
-                    let dataToSend = {
-                        paymentMethod: 'Online Payment',
-                        tableData: tableData,
-                        formData: formObject,
-                    };
-                    console.log('it is formdata')
-                    axios.post('/placeOrder', dataToSend)
-                        .then(response => {
-                            console.log(response.data.orderData, 'it is formdata')
-                            razorpayPayment(response.data.order, response.data.orderData);
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
+            function handleOnlinePayment(id, formObject, tableData, coupenId) {
+
+                if (id == undefined && Object.values(formObject).length == 0) {
+
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Address Selection Required',
+                        text: 'Please select an address before proceeding to checkout.',
+                        confirmButtonText: 'OK'
+                    });
+
                 } else {
-                    let dataToSend = {
-                        paymentMethod: 'Online Payment',
-                        tableData: tableData,
-                        addressId: id
-                    };
-                    axios.post('/placeOrder', dataToSend)
-                        .then(response => {
-                            console.log('here is reached')
-                            razorpayPayment(response.data.order, response.data.orderData);
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
+
+
+                    if (id == undefined) {
+                        console.log(formObject, 'it is formObject')
+                        let dataToSend = {
+                            paymentMethod: 'Online Payment',
+                            tableData: tableData,
+                            formData: formObject,
+                            coupenId: coupenId
+
+                        };
+                        console.log('it is formdata,axos')
+                        axios.post('/placeOrder', dataToSend)
+                            .then(response => {
+                                console.log(response.data.orderData, 'it is formdata')
+                                razorpayPayment(response.data.order, response.data.orderData);
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    } else if (Object.values(formObject).length == 0) {
+                        console.log('it is elselsldkfjcl')
+
+                        let dataToSend = {
+                            paymentMethod: 'Online Payment',
+                            tableData: tableData,
+                            addressId: id,
+                            coupenId: coupenId
+                        };
+                        axios.post('/placeOrder', dataToSend)
+                            .then(response => {
+                                console.log('here is reached')
+                                razorpayPayment(response.data.order, response.data.orderData);
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    }
+
                 }
             }
 
 
-            function handleWalletPayment(id, formObject, tableData) {
+            function handleWalletPayment(id, formObject, tableData, coupenId) {
                 if (id == undefined) {
                     let dataToSend = {
                         paymentMethod: 'Wallet',
                         tableData: tableData,
                         formData: formObject,
+                        coupenId: coupenId
                     };
                     console.log('it is formdata')
                     axios.post('/placeOrder', dataToSend)
@@ -670,7 +850,8 @@
                     let dataToSend = {
                         paymentMethod: 'Wallet',
                         tableData: tableData,
-                        addressId: id
+                        addressId: id,
+                        coupenId: coupenId
                     };
                     axios.post('/placeOrder', dataToSend)
                         .then(response => {
@@ -742,11 +923,63 @@
 
         </script>
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+        <script>
+            //coupen script
+            document.getElementById('coupenPass').addEventListener('click', function (event) {
+                event.preventDefault()
+                let coupenCode = document.getElementById('checkout-discount-input').value
+                console.log(coupenCode, 'it is coupencode')
+
+                if (coupenCode) {
+
+                    axios.get(`/accessCoupon/?coupencode=${coupenCode}`)
+                        .then(response => {
+                            if (response.data.matchingCode) {
+                                let matchingCode = response.data.matchingCode
+                                let currentAmount = parseInt(totalAmount.innerText)
+
+
+                                if (matchingCode[0].cryteriaAmount < currentAmount) {
+                                    let coupenedvalue = currentAmount - ((matchingCode[0].discountPercentage * currentAmount) / 100)
+                                    coupenId = matchingCode[0]._id
+
+
+                                    document.getElementById('totalAmount').innerHTML = parseInt(coupenedvalue)
+
+                                } else {
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Insufficient Amount',
+                                        text: "The minimum amount required for the discount has not been met.",
+                                        confirmButtonText: 'OK'
+                                    });
+
+
+                                }
 
 
 
+                            } else if (response.data.status == false) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Coupon Code Unavailable',
+                                    text: "We are unable to find this coupon code.",
+                                    confirmButtonText: 'OK'
+                                });
 
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }
+            })
+
+
+        </script>
 
 
 
@@ -840,6 +1073,124 @@
                 </div><!-- End .container -->
             </div><!-- End .footer-bottom -->
         </footer><!-- End .footer -->
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+
+
+
+
+    <!-- Plugins JS File -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="assets/js/jquery.waypoints.min.js"></script>
+    <script src="assets/js/superfish.min.js"></script>
+    <script src="assets/js/owl.carousel.min.js"></script>
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <footer class="footer">
+        <div class="footer-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget widget-about">
+                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                                height="25">
+                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
+                                magna eros eu erat. </p>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                        class="icon-facebook-f"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                        class="icon-twitter"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                        class="icon-instagram"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                        class="icon-youtube"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                        class="icon-pinterest"></i></a>
+                            </div><!-- End .soial-icons -->
+                        </div><!-- End .widget about-widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="about.html">About Molla</a></li>
+                                <li><a href="#">How to shop on Molla</a></li>
+                                <li><a href="#">FAQ</a></li>
+                                <li><a href="contact.html">Contact us</a></li>
+                                <li><a href="login.html">Log in</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Payment Methods</a></li>
+                                <li><a href="#">Money-back guarantee!</a></li>
+                                <li><a href="#">Returns</a></li>
+                                <li><a href="#">Shipping</a></li>
+                                <li><a href="#">Terms and conditions</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Sign In</a></li>
+                                <li><a href="cart.html">View Cart</a></li>
+                                <li><a href="#">My Wishlist</a></li>
+                                <li><a href="#">Track My Order</a></li>
+                                <li><a href="#">Help</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+                </div><!-- End .row -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-middle -->
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                <!-- End .footer-copyright -->
+                <figure class="footer-payments">
+                    <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
+                </figure><!-- End .footer-payments -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-bottom -->
+    </footer><!-- End .footer -->
     </div><!-- End .page-wrapper -->
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 
@@ -1031,24 +1382,6 @@
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
 
-
-    <script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    </script>
 
 
 

@@ -7,6 +7,7 @@ const { cart } = require('../middleware/auth')
 const Razorpay = require('razorpay');
 var crypto = require('crypto')
 const Wallet = require('../model/walletModel')
+const Coupen = require('../model/coupenModel')
 
 let instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -26,13 +27,14 @@ let getCheckout = async (req, res) => {
         const address = await Address.find({ userId: user_id })
         const cart = await Cart.findOne({ userId: user_id }).populate('Products.productId')
         const wallet = await Wallet.findOne({ userId: user_id });
+        const coupen = await Coupen.find({ claimed: false })
         let displayCart = [];
 
 
 
         if (cart.Products.length > 0) {
 
-            res.render('user/checkout', { address, cart, wallet })
+            res.render('user/checkout', { address, cart, wallet, coupen })
         } else {
 
             res.render('user/cart', { displayCart, cartEmty: 'cart is emty' })
@@ -52,10 +54,13 @@ let placeOrder = async (req, res) => {
 
     try {
 
-        let { paymentMethod, tableData, addressId, formData } = req.body
+        let { paymentMethod, addressId, formData, coupenId } = req.body
+        console.log(coupenId, 'it is coupencode')
         const { user_id } = req.session
         const userCart = await Cart.findOne({ userId: user_id }).populate('Products.productId')
         const selectedAddress = await Address.findOne({ _id: addressId });
+
+        // const selectedCoupen = await Coupen.findOne({_id:coupenid})
 
         let status = paymentMethod == 'Cash on delivery' ? 'Placed' : 'Pending'
 
@@ -70,6 +75,17 @@ let placeOrder = async (req, res) => {
         }))
 
         let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0)
+        if (coupenId != undefined) {
+
+            let selectedCoupon = await Coupen.findOneAndUpdate(
+                { _id: coupenId },
+                { $set: { claimed: true } },
+                { new: true }
+            )
+
+            subTotal = parseInt(subTotal - ((subTotal * selectedCoupon.discountPercentage) / 100))
+        }
+        console.log(subTotal, 'it is coupened value')
 
 
         if (paymentMethod == 'Cash on delivery') {
@@ -151,7 +167,8 @@ let placeOrder = async (req, res) => {
                 currency: "INR",
                 receipt: "receipt#1",
 
-            }, (err, order) => {
+            }, (err,order) => {
+                console.log(err, "it is error ")
                 console.log(order, "it is razor pay ")
                 res.json({ order, orderData })
             })

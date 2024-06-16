@@ -382,7 +382,7 @@
 
                                             <% }else{ %>
 
-                                                <span class="product-label">New</span>
+                                                <span class="product-label">New Arrivals</span>
                                                 <% } %>
                                                     <a href="/details/<%= element._id %>">
                                                         <img style="height: 200px; object-fit: cover;"
@@ -412,12 +412,16 @@
                                             <div class="out-price">₹ <%=element.price%>
                                             </div><!-- End .out-price -->
                                         </div><!-- End .product-price -->
+                                        <%if( typeof user_id !='undefined' ){ %>
 
-                                        <div class="product-action">
-                                            <a href="#" onclick="addCart('<%= element._id %>')"
-                                                class="btn-product btn-cart"><span>add to cart</span><i
-                                                    class="icon-long-arrow-right"></i></a>
-                                        </div><!-- End .product-action -->
+
+                                            <div class="product-action">
+                                                <a href="#" onclick="addCart('<%= element._id %>')"
+                                                    class="btn-product btn-cart"><span>add to cart</span><i
+                                                        class="icon-long-arrow-right"></i></a>
+                                            </div><!-- End .product-action -->
+
+                                            <% } %>
                                     </div><!-- End .product-body -->
                                 </div><!-- End .product -->
                             </div><!-- End .product-item -->
@@ -442,7 +446,7 @@
 
 
 
-  
+
 
 
 

@@ -240,6 +240,7 @@
                 <div class="modal-body" id="modalBody">
                     <!-- Dynamic content will be added here -->
                 </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveButton">Save</button>
@@ -285,6 +286,7 @@
         <h5 class="card-title">${item.offerName}</h5>
         <p class="card-text">${item.offPercentage}% off</p>
         <input type="checkbox" name="options" value="${item._id}" class="single-checkbox">
+        <div><button class="btn btn-primary">remove offer</button></div>
     </div>
 `;
                 modalBody.appendChild(card);

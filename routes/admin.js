@@ -7,6 +7,7 @@ const adminController = require('../controllers/adminController')
 const productController = require('../controllers/productController')
 const orderController = require('../controllers/orderController')
 const offerContoller = require('../controllers/offerController')
+const coupenController = require('../controllers/coupenController')
 const adminAuth = require('../middleware/adminauth')
 const upload = require('../middleware/uploadImage')
 
@@ -68,9 +69,13 @@ router.patch('/saveCategoryOffer/:catOfferId/:categoryId', adminController.saveC
 
 
 //OFFER
-router.get('/offer', offerContoller.getOffer)
-router.post('/addOffer', offerContoller.addOffer)
-router.delete('/deleteOffer/:offerId', offerContoller.deleteOffer)
+router.get('/offer', adminAuth.is_login,offerContoller.getOffer)
+router.post('/addOffer', adminAuth.is_login,offerContoller.addOffer)
+router.delete('/deleteOffer/:offerId',adminAuth.is_login, offerContoller.deleteOffer)
+
+//coupen
+router.get('/getCoupen',coupenController.getCoupen)
+router.post('/addCoupen',coupenController.addCoupen)
 
 
 

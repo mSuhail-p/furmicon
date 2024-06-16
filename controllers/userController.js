@@ -8,6 +8,7 @@ const userAddress = require('../model/Address')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const Wallet = require('../model/walletModel')
+const Return = require('../model/returnModel')
 
 
 
@@ -268,7 +269,7 @@ const verifiedLogin = async (req, res) => {
 
 const loadHome = async (req, res) => {
     try {
-        const product = await Product.find({}).populate('category')
+        const product = await Product.find({quantity:{$gt:0}}).sort({date:-1}).limit(12).populate('category')
         const category = await Category.find({})
 
         if (req.session.user_id) {
@@ -1033,6 +1034,44 @@ let cancelOrder = async (req, res) => {
 
 
 
+let returnProduct = async (req, res) => {
+    try {
+
+        let { reason, orderId, productId } = req.query
+        console.log(reason, orderId, 'it is reason')
+        let addReturn = new Return({
+            orderId: orderId,
+            reason: reason
+        })
+        await addReturn.save();
+
+        let statusChange = await Orders.updateOne(
+            { 'orderedProducts._id': productId }, // Find the document with the matching subdocument _id
+            { $set: { 'orderedProducts.$.status': 'Returned' } } // Use the positional operator $ to update the status
+        );
+
+
+        console.log(statusChange)
+
+        res.json({ status: true })
+
+
+
+
+
+    } catch (error) {
+        console.log('error rendering returnProduct:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the returnProduct' })
+    }
+}
+
+
+
+
+
+
+
+
 
 
 const deleteAddress = async (req, res) => {
@@ -1112,6 +1151,7 @@ module.exports = {
     getOrder,
     deleteAddress,
     cancelOrder,
+    returnProduct,
     changePassword,
     changinPassword,
     signout
