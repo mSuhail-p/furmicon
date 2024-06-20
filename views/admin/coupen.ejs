@@ -73,10 +73,27 @@
 
                 </li>
 
-                <li class="menu-item has-submenu  active">
+                <li class="menu-item  ">
                     <a class="menu-link" href="/admin/offer">
                         <i class="icon material-icons md-person"></i>
                         <span class="text">Offer</span>
+                    </a>
+
+                </li>
+
+
+                <li class="menu-item has-submenu  active ">
+                    <a class="menu-link" href="/admin/getCoupen">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Coupen</span>
+                    </a>
+
+                </li>
+
+                <li class="menu-item  ">
+                    <a class="menu-link" href="/admin/getSalesReport">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Sales report</span>
                     </a>
 
                 </li>
@@ -240,13 +257,13 @@
                                 </tr>
                             </thead>
                             <% if(coupens.length> 0){ %>
-                                <% coupens.forEach(element=> { %>
+                                <% coupens.forEach((element,index)=> { %>
 
 
 
 
                                     <tbody class="text-center">
-                                        <tr id="offer">
+                                        <tr id="coupen-<%=index%>">
 
                                             <td><b>
                                                     <%=element. coupenName%>
@@ -260,7 +277,7 @@
                                             <td>
                                                 <%= new Date(element.expiryDate).toDateString() %>
                                             </td>
-                                            
+
                                             <td>
                                                 <%=element.cryteriaAmount%>
                                             </td>
@@ -275,8 +292,9 @@
                                                     data-bs-toggle="modal" data-bs-target="#addCoupeModal">
                                                     Edit
                                                 </button>
-                                                <a href="#" class=" btn-sm font-sm border">Delete
-                                                </a>
+                                                <button onclick="deleteCoupen('<%=element._id%>','<%=index%>')"
+                                                    class=" btn-sm font-sm border">Delete
+                                                </button>
 
                                                 <!-- dropdown //end -->
                                             </td>
@@ -420,7 +438,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="discount" class="form-label">Discount</label>
+                            <label for="discount" class="form-label">Discount (in percentage)</label>
                             <input type="number" name="discount" class="form-control" id="discount" required>
 
                             <div class="modal-error" id="discountError"></div>
@@ -475,18 +493,30 @@
                 }
 
                 // Validate coupen discount
-                if (!$('#discount').val()) {
+                let percentage = $('#discount').val()
+                if (percentage > 100) {
+                    isValid = false;
+                    $('#discountError').text('must be under the 100');
+                } else if (!percentage.trim()) {
                     isValid = false;
                     $('#discountError').text('discount is required.');
+
+                } else if (percentage < 0) {
+                    isValid = false;
+                    $('#discountError').text('must be above the 0');
                 } else {
                     $('#discountError').text('');
                 }
 
                 // Validate Offer expiryDate
-                let percentage = $('#expiryDate').val();
-                if (!percentage || percentage < 0 || percentage > 100) {
+                let today = new Date().date
+                console.log(today)
+                if (!$('#expiryDate').val()) {
                     isValid = false;
-                    $('#expiryDateError').text('Expiry Date is required (0-100).');
+                    $('#expiryDateError').text('Expiry Date is required ');
+                } else if ($('#expiryDate').val() == today) {
+                    isValid = false;
+                    $('#expiryDateError').text('Expiry Date is required ');
                 } else {
                     $('#expiryDateError').text('');
                 }
@@ -532,13 +562,14 @@
 
     <script>
 
-        function deleteOffer(offerId, index) {
-            const eachOffer = document.getElementById(`offer-${index}`);
-            console.log(eachOffer)
-            axios.delete(`/admin/deleteOffer/${offerId}`)
+        function deleteCoupen(coupenId, index) {
+            const eachCoupen = document.getElementById(`coupen-${index}`);
+            console.log("it is coupenid", coupenId, "it is index", index)
+
+            axios.delete(`/admin/deleteCoupen/${coupenId}`)
                 .then(Response => {
-                    if (Response.data.delete) {
-                        eachOffer.remove()
+                    if (Response.data.deleteCoupen) {
+                        eachCoupen.remove()
                     }
                 })
                 .catch(error => {

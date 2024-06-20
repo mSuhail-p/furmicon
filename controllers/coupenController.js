@@ -42,7 +42,7 @@ const accessCoupen = async (req, res) => {
 
         let matchingCode = await Coupen.find({ coupenCode: coupenCode })
         if (matchingCode.length > 0) {
-            console.log(matchingCode,'kdskflsd')
+            console.log(matchingCode, 'kdskflsd')
             res.json({ matchingCode })
 
         } else {
@@ -56,11 +56,25 @@ const accessCoupen = async (req, res) => {
     }
 }
 
+let deleteCoupen = async (req, res) => {
+    try {
+        let {coupenId} = req.params
+        
+        let deleteCoupen = await Coupen.deleteOne({_id:coupenId})
+        res.json({deleteCoupen:true})
+
+
+    } catch (error) {
+        console.log("error rendering deleteCoupen  :", error)
+    }
+}
+
 
 
 module.exports = {
 
     getCoupen,
     addCoupen,
-    accessCoupen
+    accessCoupen,
+    deleteCoupen
 }

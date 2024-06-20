@@ -70,13 +70,55 @@ const deleteOffer = async (req, res) => {
 }
 
 
+const editOffer = async (req, res) => {
+    try {
+
+      let {offerID} = req.query
+       let selected= await Offer.findOne({_id:offerID})
+       res.render('admin/editOffer',{selected})
+        
+
+    } catch (error) {
+        console.log('as error when rendering editOffer:', error)
+    }
+}
+
+
+const editingOffer = async (req, res) => {
+    try {
+
+
+        const { offername, description, type, percentage, id } = req.body
+        console.log(id, 'it is iddd')
+
+        let edited = await Offer.updateOne({_id:id},{$set:{
+            offerName:offername,
+            description:description,
+            offPercentage:percentage,
+            type:type
+        }})
+
+        console.log(edited)
+        res.json({edtiStatus:true})
+
+     
+
+    } catch (error) {
+        console.log('as error when rendering editingOffer:', error)
+    }
+}
+
+
+
 
 
 
 module.exports = {
     getOffer,
     addOffer,
-    deleteOffer
+    deleteOffer,
+    editOffer,
+    editingOffer
 }
 
 

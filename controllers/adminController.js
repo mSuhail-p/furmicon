@@ -2,6 +2,8 @@ const Admin = require('../model/Admin')
 const User = require('../model/userModel')
 const Category = require('../model/category');
 const offer = require('../model/OfferModel')
+const Product = require('../model/product')
+const Order = require('../model/order')
 
 
 const bcrypt = require('bcrypt')
@@ -52,7 +54,8 @@ const verifyLogin = async (req, res) => {
                 req.session.admin = credential._id;
 
 
-                res.render('admin/dashboad')
+                // res.render('admin/dashboad')
+                res.redirect('/admin/dashboad')
 
             } else {
                 res.redirect('/admin');
@@ -68,7 +71,26 @@ const verifyLogin = async (req, res) => {
 
 const dashboad = async (req, res) => {
     try {
-        res.render('admin/dashboad.ejs');
+
+
+
+        let productCount = await Product.find().count()
+        let categoryCount = await Category.find().count()
+
+        let counts = [productCount,categoryCount]
+
+        let orders = await Order.aggregate([
+            {
+                $match: { orderStatus: { $ne: 'Cancelled' } }
+            },{$group:{_id:'',count:{$sum:1},totalRevenue:{$sum:'$subTotal'}}}
+        ])
+
+        console.log(orders, 'it is orders')
+
+
+
+
+        res.render('admin/dashboad.ejs',{orders,counts});
     } catch (error) {
         console.log(error);
     }
@@ -154,13 +176,14 @@ const loadCategory = async (req, res) => {
     try {
 
         const allCategory = await Category.find({}).populate('offer')
-        const categoryOffer = await offer.find({type:'category'})
+        const categoryOffer = await offer.find({ type: 'category' })
+
 
 
 
         // const checking = Category.find({status:false})
 
-        res.render('admin/category', { allCategory,categoryOffer });
+        res.render('admin/category', { allCategory, categoryOffer });
 
 
 
@@ -210,10 +233,10 @@ const editCategoryLoad = async (req, res) => {
 
         const { categoryId } = req.params
         const editCategory = await Category.findOne({ _id: categoryId }).populate('offer')
-        const categoryOffer = await offer.find({type:'category'})
+        const categoryOffer = await offer.find({ type: 'category' })
 
 
-        res.render('admin/editCategory', { editCategory,categoryOffer })
+        res.render('admin/editCategory', { editCategory, categoryOffer })
 
     } catch (error) {
         console.log(error)
@@ -221,7 +244,7 @@ const editCategoryLoad = async (req, res) => {
 }
 
 
-const saveCategoryOffer= async (req, res) => {
+const saveCategoryOffer = async (req, res) => {
     try {
 
         const { catOfferId } = req.params
@@ -230,10 +253,10 @@ const saveCategoryOffer= async (req, res) => {
         // const selectedOffer = await Offer.findOne({ _id: offerId })
         // const offeredCategory = await Product.findOne({ _id: productId })
         // let offerPrice = offeredProduct.price - (selectedOffer.offPercentage / 100) * offeredProduct.price
-        let addOffer = await Category.findOneAndUpdate({ _id: categoryId }, { $set: { offer: catOfferId} })
+        let addOffer = await Category.findOneAndUpdate({ _id: categoryId }, { $set: { offer: catOfferId } })
         console.log(addOffer, 'it is addoffer')
 
-        res.json({status:true})
+        res.json({ status: true })
 
 
 
@@ -258,7 +281,7 @@ const editingCategory = async (req, res) => {
 
 
         const categoryId = req.params.catergory_id
-        
+
         const allCategory = await Category.find({});
 
         // const currentCategory = await Category.findOne({ _id: categoryId });

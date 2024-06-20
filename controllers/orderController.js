@@ -61,9 +61,34 @@ const changeOrderStatus = async (req, res) => {
     }
 }
 
+let getSalesReport = async (req, res) => {
+    try {
+        let order = await Order.find({})
+        console.log(order)
+        let report = await Order.aggregate([
+
+            {
+                $group: {
+                    _id: "$purchasedDate",
+                    totalCount: { $sum: 1 },totalRevenue:{$sum:'$subTotal'}
+                }
+            },{$sort:{_id:-1}}
+        ]);
+
+
+        console.log(report, 'it is report')
+        res.render('admin/salesReport',{report})
+
+
+    } catch (error) {
+        console.log('error rendering getsales report :', error)
+    }
+}
+
 
 module.exports = {
 
     getOrder,
-    changeOrderStatus
+    changeOrderStatus,
+    getSalesReport
 }

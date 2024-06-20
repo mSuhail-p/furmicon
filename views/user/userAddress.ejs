@@ -20,7 +20,7 @@
 
         .sidebar {
             height: 100vh;
-            background-color: #333;
+            background-color:#fff;  
             color: #fff;
             padding: 2rem;
             border-top-right-radius: 10px;
@@ -37,7 +37,7 @@
         }
 
         .sidebar-nav a {
-            color: #fff;
+            color: #000000;
             text-decoration: none;
             padding: 0.75rem 1rem;
             display: flex;
@@ -51,7 +51,7 @@
         }
 
         .sidebar-nav a.active {
-            background-color: #007bff;
+            background-color:#c96
         }
 
         .sidebar-nav a i {
@@ -91,30 +91,39 @@
             /* Adjust the value as needed */
         }
     </style>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-white border border-warning pr-5 ">
         <div class="container">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <h3 class="nav-link   border border-dark  " style="color: #c96;" >FurniFusion</h3>
+                    </li> 
+                    
+                </ul>
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/home">Home</a>
+                        <a class="nav-link text-dark" href="/home">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/shop">Shop</a>
+                        <a class="nav-link text-dark" href="/shop">Shop</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
+                        <a class="nav-link text-dark" href="#">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
+                        <a class="nav-link text-dark" href="#">About</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                        <a class="nav-link text-dark" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/wishlist"><i class="fa fa-heart"></i></a>
                     </li>
                 </ul>
             </div>
@@ -138,10 +147,10 @@
 
             <style>
                 .borderCreate {
-                    border: 1px solid #000;
-                    border-radius: 20px;
-                    border-color: rgb(0, 0, 0);
-                    border-width: 2px;
+                    /* border: 1px solid #000; */
+                    /* border-radius: 20px; */
+                    /* border-color: rgb(0, 0, 0); */
+                    /* border-width: 2px; */
                     height: 590px;
                     overflow-y: scroll;
 

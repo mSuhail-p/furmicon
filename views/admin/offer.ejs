@@ -81,6 +81,21 @@
 
                 </li>
 
+                <li class="menu-item  ">
+                    <a class="menu-link" href="/admin/getCoupen">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Coupen</span>
+                    </a>
+
+                </li>
+
+                <li class="menu-item  ">
+                    <a class="menu-link" href="/admin/getSalesReport">
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Sales report</span>
+                    </a>
+
+                </li>
 
 
 
@@ -266,11 +281,10 @@
                                             <td class="text-end">
                                                 <!-- <a href="#" class="btn btn-md rounded font-sm">Detail</a> -->
 
-                                                <button type="button"
-                                                    class="btn btn-light rounded btn-sm font-sm border"
-                                                    data-bs-toggle="modal" data-bs-target="#addOfferModal">
+                                                <a href="/admin/editOffer/?offerID=<%=offer._id%>" type="button"
+                                                    class="btn btn-light rounded btn-sm font-sm border">
                                                     Edit
-                                                </button>
+                                                </a>
                                                 <a href="#" onclick="deleteOffer('<%=offer._id%>','<%=index%>')"
                                                     class=" btn-sm font-sm border">Delete
                                                 </a>
@@ -394,7 +408,7 @@
     </style>
 
 
-   <!--  ADD OFFER -->
+    <!--  ADD OFFER -->
     <div class="modal fade" id="addOfferModal" tabindex="-1" aria-labelledby="addOfferModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -513,7 +527,7 @@
             console.log(eachOffer)
             axios.delete(`/admin/deleteOffer/${offerId}`)
                 .then(Response => {
-                    if(Response.data.delete){
+                    if (Response.data.delete) {
                         eachOffer.remove()
                     }
                 })

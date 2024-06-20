@@ -71,7 +71,7 @@
                 <% if( typeof editCategory.offer !='undefined' ){ %>
 
 
-                    <div class="container mb-3 mt-3 ">
+                    <div class="container mb-3 mt-3 " id="offerCategory">
                         <div class="row">
                             <div class="col-md-6 mx-auto">
                                 <div class="card">
@@ -85,6 +85,8 @@
                                         <h5 class="card-title text-center">
                                             <%=editCategory.offer.description%>
                                         </h5>
+                                        <button class="btn small border border-5 text-danger"
+                                            onclick="removeOffer('<%=editCategory._id%>')">Romove offer</button>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +129,21 @@
         </div>
 
 
+        <script>
+            function removeOffer(categoryId) {
+                event.preventDefault()
+                axios.patch(`/admin/removeOffer/?id=${categoryId}&&type=category`)
+                    .then(response => {
+                        document.getElementById('offerCategory').remove()
 
+                    })
+                    .catch(error => {
+                        console.log('error at removeOffer(categoryside):', error)
+                    })
+            }
+
+
+        </script>
 
 
         <script>

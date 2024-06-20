@@ -11,7 +11,9 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            /* background: linear-gradient(135deg, #71b7e6, #9b59b6); */
+            background-image: url(/assets/images/backgrounds/old.jpg);
+            background-size: cover;
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -21,10 +23,18 @@
         .login-container {
             max-width: 400px;
             width: 100%;
-            background-color: #fff;
+            /* background-color:#dac3b3; */
+            margin-left: -90px;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
+            /* From https://css.glass */
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .form-group i {
@@ -38,6 +48,8 @@
         .form-group input {
             padding-left: 30px;
         }
+
+        
     </style>
 </head>
 
@@ -53,19 +65,19 @@
                 <i class="fas fa-lock"></i>
                 <input type="password" class="form-control eye-icon" id="password" name="password"
                     placeholder="Enter your password">
-                
+
             </div>
 
-           
+
 
             <button type="submit" class="btn btn-primary btn-block">Login</button>
 
             <div class="text-right">
-                <a href="/signUp" class="text-danger ">Sign up</a>
+                <a href="/signUp" class="text-danger">Sign up</a>
                 <a href="#" class="text-danger ml-2">Forget Password?</a>
             </div>
             <div class="my-3 text-center">
-                <small class="text-muted">Or Login with</small>
+                <small class="text-white">Or Login with</small>
             </div>
             <div class="d-flex justify-content-center">
                 <a href="/auth/google" class="btn btn-danger mx-2"><i class="fab fa-google"></i> Google</a>
@@ -145,6 +157,14 @@
 
         </form>
     </div>
+
+    <!-- <div style="display: flex;">
+
+        <div id="details" class="info-section">
+            <h1>Furmicone</h1>
+            <p>Quality is never compromised</p>
+        </div>
+    </div> -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>

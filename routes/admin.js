@@ -45,6 +45,7 @@ router.get('/edit_product/:editProduct', adminAuth.is_login, productController.e
 const imgUploads = upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }]);
 router.post('/edit_product/:productId', imgUploads, productController.edit_product);
 router.patch('/saveOffer/:offerId/:productId', productController.saveOffer)
+router.patch('/removeOffer',productController.removeOffer)
 
 
 //ORDERS
@@ -69,13 +70,20 @@ router.patch('/saveCategoryOffer/:catOfferId/:categoryId', adminController.saveC
 
 
 //OFFER
-router.get('/offer', adminAuth.is_login,offerContoller.getOffer)
-router.post('/addOffer', adminAuth.is_login,offerContoller.addOffer)
-router.delete('/deleteOffer/:offerId',adminAuth.is_login, offerContoller.deleteOffer)
+router.get('/offer', adminAuth.is_login,adminAuth.is_login,offerContoller.getOffer)
+router.post('/addOffer',adminAuth.is_login, adminAuth.is_login,offerContoller.addOffer)
+router.delete('/deleteOffer/:offerId',adminAuth.is_login,adminAuth.is_login, offerContoller.deleteOffer)
+router.get('/editOffer',offerContoller.editOffer)
+router.patch('/editOffer',offerContoller.editingOffer)
 
 //coupen
-router.get('/getCoupen',coupenController.getCoupen)
-router.post('/addCoupen',coupenController.addCoupen)
+router.get('/getCoupen',adminAuth.is_login,coupenController.getCoupen)
+router.post('/addCoupen',adminAuth.is_login,coupenController.addCoupen)
+router.delete('/deleteCoupen/:coupenId',adminAuth.is_login,coupenController.deleteCoupen)
+
+//sales report
+router.get('/getSalesReport',adminAuth.is_login,orderController.getSalesReport)
+
 
 
 

@@ -103,7 +103,7 @@
                                 <a href="#">Links</a>
                                 <ul>
                                     <li><a href="tel:#"><i class="icon-phone"></i>Call:+91 9400981702</a></li>
-                                    <li><a href="wishlist.html"><i class="icon-heart-o"></i>Wishlist</a></li>
+                                    <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist</a></li>
 
                                 </ul>
                             </li>
@@ -121,28 +121,28 @@
                         </button>
 
                         <a href="index.html" class="logo">
-                            <img src="assets/images/logo.png" alt="Molla Logo" width="105" height="25">
+                            <h3 class="nav-link  border border-dark  " style="color: #c96;">FurniFusion</h3>
                         </a>
 
                         <nav class="main-nav">
                             <ul class="menu sf-arrows">
                                 <li class="megamenu-container ">
-                                    <a href="index.html" class="sf-with-ul">Home</a>
+                                    <a href="/home" class="sf-with-ul">Home</a>
 
 
                                 </li>
                                 <li>
-                                    <a href="category.html" class="sf-with-ul">Shop</a>
+                                    <a href="/shop" class="sf-with-ul">Shop</a>
 
 
                                 </li>
                                 <li>
-                                    <a href="product.html" class="sf-with-ul">Product</a>
+                                    <a href="#" class="sf-with-ul">Contact</a>
 
 
                                 </li>
                                 <li>
-                                    <a href="#" class="sf-with-ul">Pages</a>
+                                    <a href="#" class="sf-with-ul">About</a>
 
 
                                 </li>
@@ -171,90 +171,21 @@
                                 <i class="icon-random"></i>
                             </a>
 
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <ul class="compare-products">
-                                    <li class="compare-product">
-                                        <a href="#" class="btn-remove" title="Remove Product"><i
-                                                class="icon-close"></i></a>
-                                        <h4 class="compare-product-title"><a href="product.html">Blue Night Dress</a>
-                                        </h4>
-                                    </li>
-                                    <li class="compare-product">
-                                        <a href="#" class="btn-remove" title="Remove Product"><i
-                                                class="icon-close"></i></a>
-                                        <h4 class="compare-product-title"><a href="product.html">White Long Skirt</a>
-                                        </h4>
-                                    </li>
-                                </ul>
 
-                                <div class="compare-actions">
-                                    <a href="#" class="action-link">Clear All</a>
-                                    <a href="#" class="btn btn-outline-primary-2"><span>Compare</span><i
-                                            class="icon-long-arrow-right"></i></a>
-                                </div>
-                            </div><!-- End .dropdown-menu -->
                         </div><!-- End .compare-dropdown -->
 
                         <div class="dropdown cart-dropdown">
                             <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false" data-display="static">
                                 <i class="icon-shopping-cart"></i>
-                                <span class="cart-count">2</span>
+
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right">
-                                <div class="dropdown-cart-products">
-                                    <div class="product">
-                                        <div class="product-cart-details">
-                                            <h4 class="product-title">
-                                                <a href="product.html">Beige knitted elastic runner shoes</a>
-                                            </h4>
 
-                                            <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $84.00
-                                            </span>
-                                        </div><!-- End .product-cart-details -->
-
-                                        <figure class="product-image-container">
-                                            <a href="product.html" class="product-image">
-                                                <img src="assets/images/products/cart/product-1.jpg" alt="product">
-                                            </a>
-                                        </figure>
-                                        <a href="#" class="btn-remove" title="Remove Product"><i
-                                                class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-
-                                    <div class="product">
-                                        <div class="product-cart-details">
-                                            <h4 class="product-title">
-                                                <a href="product.html">Blue utility pinafore denim dress</a>
-                                            </h4>
-
-                                            <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $76.00
-                                            </span>
-                                        </div><!-- End .product-cart-details -->
-
-                                        <figure class="product-image-container">
-                                            <a href="product.html" class="product-image">
-                                                <img src="assets/images/products/cart/product-2.jpg" alt="product">
-                                            </a>
-                                        </figure>
-                                        <a href="#" class="btn-remove" title="Remove Product"><i
-                                                class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-                                </div><!-- End .cart-product -->
-
-                                <div class="dropdown-cart-total">
-                                    <span>Total</span>
-
-                                    <span class="cart-total-price">$160.00</span>
-                                </div><!-- End .dropdown-cart-total -->
 
                                 <div class="dropdown-cart-action">
-                                    <a href="cart.html" class="btn btn-primary">View Cart</a>
+                                    <a href="/viewCart" class="btn btn-primary">View Cart</a>
                                     <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i
                                             class="icon-long-arrow-right"></i></a>
                                 </div><!-- End .dropdown-cart-total -->
@@ -268,7 +199,7 @@
         <main class="main">
             <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
                 <div class="container">
-                    <h1 class="page-title">Checkout<span>Shop</span></h1>
+                    <h1 class="page-title">Checkout</h1>
                 </div><!-- End .container -->
             </div><!-- End .page-header -->
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
@@ -828,155 +759,172 @@
 
 
             function handleWalletPayment(id, formObject, tableData, coupenId) {
-                if (id == undefined) {
-                    let dataToSend = {
-                        paymentMethod: 'Wallet',
-                        tableData: tableData,
-                        formData: formObject,
-                        coupenId: coupenId
-                    };
-                    console.log('it is formdata')
-                    axios.post('/placeOrder', dataToSend)
-                        .then(response => {
-                            if (response.data.Success) {
-                                window.location.href = `/orderPlaced/${response.data.orderId}`
-                            }
 
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                } else {
-                    let dataToSend = {
-                        paymentMethod: 'Wallet',
-                        tableData: tableData,
-                        addressId: id,
-                        coupenId: coupenId
-                    };
-                    axios.post('/placeOrder', dataToSend)
-                        .then(response => {
-                            if (response.data.Success) {
-                                window.location.href = `/orderPlaced/${response.data.orderId}`
-                            }
-
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                }
-            }
+                if (id == undefined && Object.values(formObject).length == 0) {
 
 
-            function razorpayPayment(order, orderData) {
-                console.log("here is reached, razorpayPayment");
-                var options = {
-                    "key": "rzp_test_m31KrIXyLXS9oV", // Enter the Key ID generated from the Dashboard
-                    "amount": order.amount, // Amount is in currency subunits. Multiply by 100 for paise if order.amount is in INR
-                    "currency": "INR",
-                    "name": "Furmicon", // Your business name
-                    "description": "Quality is never compromised",
-                    "order_id": order.id, // This is a sample Order ID. Pass the id obtained in the response of Step 1
-                    "handler": function (response) {
-                        console.log("Payment successful. Response:", response);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Address Selection Required',
+                        text: 'Please select an address before proceeding to checkout.',
+                        confirmButtonText: 'OK'
+                    });
 
-                        const data = {
-                            response,
-                            order,
-                            orderData
+                }else{
 
+                
+
+                    if (id == undefined) {
+                        let dataToSend = {
+                            paymentMethod: 'Wallet',
+                            tableData: tableData,
+                            formData: formObject,
+                            coupenId: coupenId
                         };
-
-                        axios.post('/verifyPayment', data)
+                        console.log('it is formdata')
+                        axios.post('/placeOrder', dataToSend)
                             .then(response => {
                                 if (response.data.Success) {
-                                    window.location.href = `orderPlaced/${response.data.orderId}`
+                                    window.location.href = `/orderPlaced/${response.data.orderId}`
                                 }
+
                             })
                             .catch(error => {
-                                console.log("Verification error:", error);
+                                console.log(error);
                             });
-                    },
-                    "prefill": { // We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
-                        "name": "Gaurav Kumar", // Your customer's name
-                        "email": "gaurav.kumar@example.com",
-                        "contact": "9000090000" // Provide the customer's phone number for better conversion rates 
-                    },
-                    "notes": {
-                        "address": "Razorpay Corporate Office"
-                    },
-                    "theme": {
-                        "color": "#3399cc"
+                    } else {
+                        let dataToSend = {
+                            paymentMethod: 'Wallet',
+                            tableData: tableData,
+                            addressId: id,
+                            coupenId: coupenId
+                        };
+                        axios.post('/placeOrder', dataToSend)
+                            .then(response => {
+                                if (response.data.Success) {
+                                    window.location.href = `/orderPlaced/${response.data.orderId}`
+                                }
+
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
                     }
-                };
 
-                // Initialize Razorpay payment
-                var rzp1 = new Razorpay(options);
+                }
+                }
 
-                // Add error handling for payment failure
-                rzp1.on('payment.failed', function (response) {
-                    console.log("Payment failed. Response:", response.error);
-                    alert(`Payment failed: ${response.error.description}`);
-                });
 
-                rzp1.open();
-            }
+                function razorpayPayment(order, orderData) {
+                    console.log("here is reached, razorpayPayment");
+                    var options = {
+                        "key": "rzp_test_m31KrIXyLXS9oV", // Enter the Key ID generated from the Dashboard
+                        "amount": order.amount, // Amount is in currency subunits. Multiply by 100 for paise if order.amount is in INR
+                        "currency": "INR",
+                        "name": "Furmicon", // Your business name
+                        "description": "Quality is never compromised",
+                        "order_id": order.id, // This is a sample Order ID. Pass the id obtained in the response of Step 1
+                        "handler": function (response) {
+                            console.log("Payment successful. Response:", response);
+
+                            const data = {
+                                response,
+                                order,
+                                orderData
+
+                            };
+
+                            axios.post('/verifyPayment', data)
+                                .then(response => {
+                                    if (response.data.Success) {
+                                        window.location.href = `orderPlaced/${response.data.orderId}`
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log("Verification error:", error);
+                                });
+                        },
+                        "prefill": { // We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+                            "name": "Gaurav Kumar", // Your customer's name
+                            "email": "gaurav.kumar@example.com",
+                            "contact": "9000090000" // Provide the customer's phone number for better conversion rates 
+                        },
+                        "notes": {
+                            "address": "Razorpay Corporate Office"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+
+                    // Initialize Razorpay payment
+                    var rzp1 = new Razorpay(options);
+
+                    // Add error handling for payment failure
+                    rzp1.on('payment.failed', function (response) {
+                        console.log("Payment failed. Response:", response.error);
+                        alert(`Payment failed: ${response.error.description}`);
+                    });
+
+                    rzp1.open();
+                }
 
         </script>
 
 
 
         <script>
-            //coupen script
-            document.getElementById('coupenPass').addEventListener('click', function (event) {
-                event.preventDefault()
-                let coupenCode = document.getElementById('checkout-discount-input').value
-                console.log(coupenCode, 'it is coupencode')
+                //coupen script
+                document.getElementById('coupenPass').addEventListener('click', function (event) {
+                    event.preventDefault()
+                    let coupenCode = document.getElementById('checkout-discount-input').value
+                    console.log(coupenCode, 'it is coupencode')
 
-                if (coupenCode) {
+                    if (coupenCode) {
 
-                    axios.get(`/accessCoupon/?coupencode=${coupenCode}`)
-                        .then(response => {
-                            if (response.data.matchingCode) {
-                                let matchingCode = response.data.matchingCode
-                                let currentAmount = parseInt(totalAmount.innerText)
-
-
-                                if (matchingCode[0].cryteriaAmount < currentAmount) {
-                                    let coupenedvalue = currentAmount - ((matchingCode[0].discountPercentage * currentAmount) / 100)
-                                    coupenId = matchingCode[0]._id
+                        axios.get(`/accessCoupon/?coupencode=${coupenCode}`)
+                            .then(response => {
+                                if (response.data.matchingCode) {
+                                    let matchingCode = response.data.matchingCode
+                                    let currentAmount = parseInt(totalAmount.innerText)
 
 
-                                    document.getElementById('totalAmount').innerHTML = parseInt(coupenedvalue)
+                                    if (matchingCode[0].cryteriaAmount < currentAmount) {
+                                        let coupenedvalue = currentAmount - ((matchingCode[0].discountPercentage * currentAmount) / 100)
+                                        coupenId = matchingCode[0]._id
 
-                                } else {
 
+                                        document.getElementById('totalAmount').innerHTML = parseInt(coupenedvalue)
+
+                                    } else {
+
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Insufficient Amount',
+                                            text: "The minimum amount required for the discount has not been met.",
+                                            confirmButtonText: 'OK'
+                                        });
+
+
+                                    }
+
+
+
+                                } else if (response.data.status == false) {
                                     Swal.fire({
                                         icon: 'error',
-                                        title: 'Insufficient Amount',
-                                        text: "The minimum amount required for the discount has not been met.",
+                                        title: 'Coupon Code Unavailable',
+                                        text: "We are unable to find this coupon code.",
                                         confirmButtonText: 'OK'
                                     });
 
-
                                 }
-
-
-
-                            } else if (response.data.status == false) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Coupon Code Unavailable',
-                                    text: "We are unable to find this coupon code.",
-                                    confirmButtonText: 'OK'
-                                });
-
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error)
-                        })
-                }
-            })
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            })
+                    }
+                })
 
 
         </script>
@@ -985,6 +933,25 @@
 
 
 
+
+
+
+
+
+        <!-- Plugins JS File -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/bootstrap.bundle.min.js"></script>
+        <script src="assets/js/jquery.hoverIntent.min.js"></script>
+        <script src="assets/js/jquery.waypoints.min.js"></script>
+        <script src="assets/js/superfish.min.js"></script>
+        <script src="assets/js/owl.carousel.min.js"></script>
+        <!-- Main JS File -->
+        <script src="assets/js/main.js"></script>
+
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 
@@ -997,8 +964,8 @@
                     <div class="row">
                         <div class="col-sm-6 col-lg-3">
                             <div class="widget widget-about">
-                                <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
-                                    height="25">
+                                <h3 class="nav-link  border border-dark  " style="color: #c96;">FurniFusion</h3>
+                                height="25">
                                 <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
                                     magna eros eu erat. </p>
 
@@ -1073,124 +1040,6 @@
                 </div><!-- End .container -->
             </div><!-- End .footer-bottom -->
         </footer><!-- End .footer -->
-    </div><!-- End .page-wrapper -->
-    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
-
-
-
-
-
-    <!-- Plugins JS File -->
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/jquery.hoverIntent.min.js"></script>
-    <script src="assets/js/jquery.waypoints.min.js"></script>
-    <script src="assets/js/superfish.min.js"></script>
-    <script src="assets/js/owl.carousel.min.js"></script>
-    <!-- Main JS File -->
-    <script src="assets/js/main.js"></script>
-
-
-
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <footer class="footer">
-        <div class="footer-middle">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget widget-about">
-                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
-                                height="25">
-                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
-                                magna eros eu erat. </p>
-
-                            <div class="social-icons">
-                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
-                                        class="icon-facebook-f"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
-                                        class="icon-twitter"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
-                                        class="icon-instagram"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
-                                        class="icon-youtube"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
-                                        class="icon-pinterest"></i></a>
-                            </div><!-- End .soial-icons -->
-                        </div><!-- End .widget about-widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
-
-                            <ul class="widget-list">
-                                <li><a href="about.html">About Molla</a></li>
-                                <li><a href="#">How to shop on Molla</a></li>
-                                <li><a href="#">FAQ</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
-                                <li><a href="login.html">Log in</a></li>
-                            </ul><!-- End .widget-list -->
-                        </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
-
-                            <ul class="widget-list">
-                                <li><a href="#">Payment Methods</a></li>
-                                <li><a href="#">Money-back guarantee!</a></li>
-                                <li><a href="#">Returns</a></li>
-                                <li><a href="#">Shipping</a></li>
-                                <li><a href="#">Terms and conditions</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
-                            </ul><!-- End .widget-list -->
-                        </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
-
-                            <ul class="widget-list">
-                                <li><a href="#">Sign In</a></li>
-                                <li><a href="cart.html">View Cart</a></li>
-                                <li><a href="#">My Wishlist</a></li>
-                                <li><a href="#">Track My Order</a></li>
-                                <li><a href="#">Help</a></li>
-                            </ul><!-- End .widget-list -->
-                        </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
-                </div><!-- End .row -->
-            </div><!-- End .container -->
-        </div><!-- End .footer-middle -->
-
-        <div class="footer-bottom">
-            <div class="container">
-                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
-                <!-- End .footer-copyright -->
-                <figure class="footer-payments">
-                    <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
-                </figure><!-- End .footer-payments -->
-            </div><!-- End .container -->
-        </div><!-- End .footer-bottom -->
-    </footer><!-- End .footer -->
     </div><!-- End .page-wrapper -->
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 

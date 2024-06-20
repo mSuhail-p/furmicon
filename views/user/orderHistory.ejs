@@ -19,7 +19,7 @@
 
         .sidebar {
             height: 100vh;
-            background-color: #333;
+            background-color: #fff;
             color: #fff;
             padding: 2rem;
             border-top-right-radius: 10px;
@@ -36,7 +36,7 @@
         }
 
         .sidebar-nav a {
-            color: #fff;
+            color: #000000;
             text-decoration: none;
             padding: 0.75rem 1rem;
             display: flex;
@@ -50,7 +50,7 @@
         }
 
         .sidebar-nav a.active {
-            background-color: #007bff;
+            background-color: #c96
         }
 
         .sidebar-nav a i {
@@ -158,31 +158,44 @@
             /* Adjust the value as needed */
         }
     </style>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark  bg-white border border-warning pr-5">
         <div class="container">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <h3 class="nav-link   border border-dark  " style="color: #c96;">FurniFusion</h3>
+                    </li>
+
+                </ul>
+
+
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/home">Home</a>
+                        <a class="nav-link   text-dark" href="/home">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/shop">Shop</a>
+                        <a class="nav-link  text-dark" href="/shop">Shop</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
+                        <a class="nav-link  text-dark" href="#">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
+                        <a class="nav-link  text-dark" href="#">About</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                        <a class="nav-link  text-dark" href="/viewCart"><i class="fas fa-shopping-cart"></i> Cart</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/wishlist"><i class="fa fa-heart"></i></a>
+                    </li>
+
                 </ul>
             </div>
         </div>
@@ -208,7 +221,7 @@
                 <h2 class="mb-4 text-center">Orders</h2>
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped">
-                        <thead class="thead-dark">
+                        <thead class="thead">
                             <tr>
                                 <th scope="col">Image</th>
                                 <th scope="col">Name</th>
@@ -243,12 +256,14 @@
                                     <%= order?.purchasedDate %>
                                 </td>
                                 <td>
+                                    
                                     <button class="btn btn-primary btn-sm view-details-btn" data-toggle="modal"
                                         data-target="#orderModal" data-product-id="<%=product._id%>"
                                         data-product-index="<%=productIndex%>"
                                         data-img-src="/userImages/<%=product.productId.images[0]%>"
                                         data-name="<%=product.productId.name%>" data-cname="<%=order.userName%>"
                                         data-quantity="<%=product.quantity%>" data-price="<%=product.price%>"
+                                        data-payment="<%=order.paymentMethod%>"
                                         data-address-name="<%=order.shipAddress[0].name%>"
                                         data-address-country="<%=order.shipAddress[0].country%>"
                                         data-address-state=" <%=order.shipAddress[0].state%>"
@@ -267,7 +282,7 @@
                                         <button
                                             onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
                                             class="btn btn-danger btn-sm"
-                                            id="cancelBtn-<%=productIndex%>">Cancel</button>
+                                            id="cancelBtn-<%=productIndex%><%=orderIndex%>">Cancel</button>
                                         <% }else if(product.status=='Delivered' ){ %>
 
                                             <button
@@ -309,7 +324,7 @@
                             const userInput = result.value;
                             axios.patch(`/returnProduct/?reason=${userInput}&&orderId=${orderId}&&productId=${productId}`)
                                 .then(response => {
-                                    if(response.data.status){
+                                    if (response.data.status) {
                                         status.innerHTML = 'Returned'
                                         document.getElementById(`returnBtn-${productIndex}`).remove()
                                     }
@@ -356,7 +371,7 @@
                                         let data = response.data.cancelled;
                                         if (data) {
                                             status.innerHTML = 'Cancelled';
-                                            document.getElementById(`cancelBtn-${productIndex}`).remove()
+                                            document.getElementById(`cancelBtn-${productIndex}${orderIndex}`).remove()
                                         }
                                     })
                                     .catch(error => {
@@ -395,10 +410,11 @@
                     <div class="order-info">
                         <div><strong>Product Image:</strong><br><img src="" id="productImage" alt="Product Image"
                                 class="img-thumbnail"></div>
-                        <div><strong>Product Name:</strong> <span id="productName"></span></div>
-                        <div><strong>Customer Name:</strong> <span id="customerName"></span></div>
+                        <div><strong>Product Name:</strong><span id="productName"></span></div>
+                        <div><strong>Customer Name:</strong><span id="customerName"></span></div>
                         <div><strong>Quantity:</strong> <span id="productQuantity"></span></div>
                         <div><strong>Price:</strong> ₹<span id="productPrice"></span></div>
+                        <div><strong>paymentMethod:</strong><span id="paymentMethod"></span></div>
                     </div>
                     <hr>
                     <div class="address-info">
@@ -427,6 +443,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+       
         $(document).ready(function () {
             $('.view-details-btn').click(function () {
                 var button = $(this);
@@ -437,6 +454,7 @@
                 var cname = button.data('cname');
                 var quantity = button.data('quantity');
                 var price = button.data('price');
+                var paymentMethod = button.data('payment');
                 var addressName = button.data('address-name');
                 var addressCountry = button.data('address-country');
                 var addressState = button.data('address-state');
@@ -447,12 +465,15 @@
                 var addressEmail = button.data('address-email');
                 var orderStatus = button.data('order-status');
                 var orderDate = button.data('order-date');
+                 
+               
 
                 $('#productImage').attr('src', imgSrc);
                 $('#productName').text(name);
                 $('#customerName').text(cname);
                 $('#productQuantity').text(quantity);
                 $('#productPrice').text(price);
+                $('#paymentMethod').text(paymentMethod)
                 $('#addressName').text(addressName);
                 $('#addressCountry').text(addressCountry);
                 $('#addressState').text(addressState);
@@ -464,7 +485,9 @@
                 $('#orderStatus').text(orderStatus);
                 $('#orderDate').text(orderDate);
             });
+            
         });
+
     </script>
 
 

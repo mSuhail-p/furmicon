@@ -150,7 +150,7 @@
                     <% if( typeof sendToEdit.offer !='undefined' ){ %>
 
 
-                        <div class="container mb-3 mt-3 ">
+                        <div class="container mb-3 mt-3  " id="cardOffer">
                             <div class="row">
                                 <div class="col-md-6 mx-auto">
                                     <div class="card">
@@ -164,6 +164,8 @@
                                             <h5 class="card-title text-center">
                                                 <%=sendToEdit.offer.description%>
                                             </h5>
+                                            <button class="btn small border border-5 text-danger"
+                                                onclick="removeOffer('<%=sendToEdit._id%>')">Romove offer</button>
                                         </div>
                                     </div>
                                 </div>
@@ -240,7 +242,7 @@
                 <div class="modal-body" id="modalBody">
                     <!-- Dynamic content will be added here -->
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveButton">Save</button>
@@ -260,7 +262,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
 
 
+    <script>
 
+        function removeOffer(productId) {
+            event.preventDefault()
+
+            axios.patch(`/admin/removeOffer/?id=${productId}&&type=product`)
+                .then(Response => {
+                    if(Response.data.status){
+                        document.getElementById('cardOffer').remove()
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        }
+    </script>
 
 
     <script>
@@ -286,7 +303,7 @@
         <h5 class="card-title">${item.offerName}</h5>
         <p class="card-text">${item.offPercentage}% off</p>
         <input type="checkbox" name="options" value="${item._id}" class="single-checkbox">
-        <div><button class="btn btn-primary">remove offer</button></div>
+         
     </div>
 `;
                 modalBody.appendChild(card);

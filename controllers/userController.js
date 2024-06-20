@@ -269,7 +269,7 @@ const verifiedLogin = async (req, res) => {
 
 const loadHome = async (req, res) => {
     try {
-        const product = await Product.find({quantity:{$gt:0}}).sort({date:-1}).limit(12).populate('category')
+        const product = await Product.find({$and:[{quantity:{$gt:0}},{is_blocked:1}]}).sort({date:-1}).limit(12).populate('category')
         const category = await Category.find({})
 
         if (req.session.user_id) {
@@ -466,7 +466,7 @@ const shopProduct = async (req, res) => {
             if (element.offer && element.category.offer) {
 
                 let largeOffer = Math.max(element.offer.offPercentage, element.category.offer.offPercentage);
-                let offerPrice = element.price - (largeOffer / 100) * element.price
+                let offerPrice = parseInt(element.price - (largeOffer / 100) * element.price)
                 console.log(offerPrice, 'it is offer price')
                 let addOfferPrice = await Product.updateOne({ _id: element._id }, { $set: { offerPrice: offerPrice } })
 

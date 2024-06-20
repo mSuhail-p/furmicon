@@ -1,9 +1,9 @@
 const Product = require('../model/product')
 const Category = require('../model/category')
+const Offer = require('../model/OfferModel')
 const mongoose = require('mongoose');
 const fs = require('fs');
-const { product } = require('./adminController');
-const Offer = require('../model/OfferModel')
+// const { product } = require('./adminController');
 // const { product } = require('./adminController');
 
 
@@ -68,7 +68,7 @@ const addProduct = async (req, res) => {
 const loadproduct = async (req, res) => {
     try {
 
-        const liproduct = await Product.find({}).populate('category').populate('offer')
+        const liproduct = await Product.find({}).sort({ date: -1 }).populate('category').populate('offer')
         // console.log(liproduct[0].offer.offerName,'it is offer name')
 
         if (liproduct) {
@@ -194,15 +194,47 @@ const saveOffer = async (req, res) => {
 
 
 
-
-
-
     } catch (error) {
 
         console.log('an error rendering saveOffer:', error)
     }
 }
 
+
+
+const removeOffer = async (req, res) => {
+    try {
+
+
+        let { type, id } = req.query
+        if (type == 'product') {
+            let selected = await Product.findOneAndUpdate(
+                { _id: id },
+                { $unset: { offer: "" } }
+            )
+
+
+        } else {
+            let selected = await Category.findOneAndUpdate(
+                { _id: id },                
+                { $unset: { offer: "" } }
+            )
+        }
+
+
+
+        res.json({ status: true })
+
+
+
+
+
+
+    } catch (error) {
+
+        console.log('an error rendering remove offer:', error)
+    }
+}
 
 
 
@@ -222,7 +254,8 @@ module.exports = {
     blockProduct,
     editProductLoad,
     edit_product,
-    saveOffer
+    saveOffer,
+    removeOffer
 
 }
 
