@@ -402,7 +402,7 @@
                                                     <tr class="summary-subtotal">
                                                         <td>Total:</td>
                                                         <td>₹<span id="totalAmount">
-                                                                <%=total%>
+                                                                <%=total+50%>
                                                             </span></td>
                                                         </td>
                                                     </tr>
@@ -639,6 +639,7 @@
             });
 
             function handleCashOnDelivery(id, formObject, tableData, coupenId) {
+                console.log(totalAmount.innerText, 'it is total')
                 if (id == undefined && Object.values(formObject).length == 0) {
 
 
@@ -649,7 +650,17 @@
                         confirmButtonText: 'OK'
                     });
 
+                } else if (parseInt(totalAmount.innerText) > 1000) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cash on Delivery Limit Notice',
+                        text: 'We regret to inform you that orders exceeding ₹1000 are not eligible for cash on delivery.',
+                        confirmButtonText: 'OK'
+                    });
+
                 } else {
+
+
 
 
 
@@ -770,9 +781,9 @@
                         confirmButtonText: 'OK'
                     });
 
-                }else{
+                } else {
 
-                
+
 
                     if (id == undefined) {
                         let dataToSend = {
@@ -812,119 +823,119 @@
                     }
 
                 }
-                }
+            }
 
 
-                function razorpayPayment(order, orderData) {
-                    console.log("here is reached, razorpayPayment");
-                    var options = {
-                        "key": "rzp_test_m31KrIXyLXS9oV", // Enter the Key ID generated from the Dashboard
-                        "amount": order.amount, // Amount is in currency subunits. Multiply by 100 for paise if order.amount is in INR
-                        "currency": "INR",
-                        "name": "Furmicon", // Your business name
-                        "description": "Quality is never compromised",
-                        "order_id": order.id, // This is a sample Order ID. Pass the id obtained in the response of Step 1
-                        "handler": function (response) {
-                            console.log("Payment successful. Response:", response);
+            function razorpayPayment(order, orderData) {
+                console.log("here is reached, razorpayPayment");
+                var options = {
+                    "key": "rzp_test_m31KrIXyLXS9oV", // Enter the Key ID generated from the Dashboard
+                    "amount": order.amount, // Amount is in currency subunits. Multiply by 100 for paise if order.amount is in INR
+                    "currency": "INR",
+                    "name": "Furmicon", // Your business name
+                    "description": "Quality is never compromised",
+                    "order_id": order.id, // This is a sample Order ID. Pass the id obtained in the response of Step 1
+                    "handler": function (response) {
+                        console.log("Payment successful. Response:", response);
 
-                            const data = {
-                                response,
-                                order,
-                                orderData
+                        const data = {
+                            response,
+                            order,
+                            orderData
 
-                            };
+                        };
 
-                            axios.post('/verifyPayment', data)
-                                .then(response => {
-                                    if (response.data.Success) {
-                                        window.location.href = `orderPlaced/${response.data.orderId}`
-                                    }
-                                })
-                                .catch(error => {
-                                    console.log("Verification error:", error);
-                                });
-                        },
-                        "prefill": { // We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
-                            "name": "Gaurav Kumar", // Your customer's name
-                            "email": "gaurav.kumar@example.com",
-                            "contact": "9000090000" // Provide the customer's phone number for better conversion rates 
-                        },
-                        "notes": {
-                            "address": "Razorpay Corporate Office"
-                        },
-                        "theme": {
-                            "color": "#3399cc"
-                        }
-                    };
+                        axios.post('/verifyPayment', data)
+                            .then(response => {
+                                if (response.data.Success) {
+                                    window.location.href = `orderPlaced/${response.data.orderId}`
+                                }
+                            })
+                            .catch(error => {
+                                console.log("Verification error:", error);
+                            });
+                    },
+                    "prefill": { // We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+                        "name": "Gaurav Kumar", // Your customer's name
+                        "email": "gaurav.kumar@example.com",
+                        "contact": "9000090000" // Provide the customer's phone number for better conversion rates 
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
 
-                    // Initialize Razorpay payment
-                    var rzp1 = new Razorpay(options);
+                // Initialize Razorpay payment
+                var rzp1 = new Razorpay(options);
 
-                    // Add error handling for payment failure
-                    rzp1.on('payment.failed', function (response) {
-                        console.log("Payment failed. Response:", response.error);
-                        alert(`Payment failed: ${response.error.description}`);
-                    });
+                // Add error handling for payment failure
+                rzp1.on('payment.failed', function (response) {
+                    console.log("Payment failed. Response:", response.error);
+                    alert(`Payment failed: ${response.error.description}`);
+                });
 
-                    rzp1.open();
-                }
+                rzp1.open();
+            }
 
         </script>
 
 
 
         <script>
-                //coupen script
-                document.getElementById('coupenPass').addEventListener('click', function (event) {
-                    event.preventDefault()
-                    let coupenCode = document.getElementById('checkout-discount-input').value
-                    console.log(coupenCode, 'it is coupencode')
+            //coupen script
+            document.getElementById('coupenPass').addEventListener('click', function (event) {
+                event.preventDefault()
+                let coupenCode = document.getElementById('checkout-discount-input').value
+                console.log(coupenCode, 'it is coupencode')
 
-                    if (coupenCode) {
+                if (coupenCode) {
 
-                        axios.get(`/accessCoupon/?coupencode=${coupenCode}`)
-                            .then(response => {
-                                if (response.data.matchingCode) {
-                                    let matchingCode = response.data.matchingCode
-                                    let currentAmount = parseInt(totalAmount.innerText)
-
-
-                                    if (matchingCode[0].cryteriaAmount < currentAmount) {
-                                        let coupenedvalue = currentAmount - ((matchingCode[0].discountPercentage * currentAmount) / 100)
-                                        coupenId = matchingCode[0]._id
+                    axios.get(`/accessCoupon/?coupencode=${coupenCode}`)
+                        .then(response => {
+                            if (response.data.matchingCode) {
+                                let matchingCode = response.data.matchingCode
+                                let currentAmount = parseInt(totalAmount.innerText)
 
 
-                                        document.getElementById('totalAmount').innerHTML = parseInt(coupenedvalue)
-
-                                    } else {
-
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Insufficient Amount',
-                                            text: "The minimum amount required for the discount has not been met.",
-                                            confirmButtonText: 'OK'
-                                        });
+                                if (matchingCode[0].cryteriaAmount < currentAmount) {
+                                    let coupenedvalue = currentAmount - ((matchingCode[0].discountPercentage * currentAmount) / 100)
+                                    coupenId = matchingCode[0]._id
 
 
-                                    }
+                                    document.getElementById('totalAmount').innerHTML = parseInt(coupenedvalue)
 
+                                } else {
 
-
-                                } else if (response.data.status == false) {
                                     Swal.fire({
                                         icon: 'error',
-                                        title: 'Coupon Code Unavailable',
-                                        text: "We are unable to find this coupon code.",
+                                        title: 'Insufficient Amount',
+                                        text: "The minimum amount required for the discount has not been met.",
                                         confirmButtonText: 'OK'
                                     });
 
+
                                 }
-                            })
-                            .catch(error => {
-                                console.log(error)
-                            })
-                    }
-                })
+
+
+
+                            } else if (response.data.status == false) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Coupon Code Unavailable',
+                                    text: "We are unable to find this coupon code.",
+                                    confirmButtonText: 'OK'
+                                });
+
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }
+            })
 
 
         </script>

@@ -96,6 +96,10 @@ const orderSchema = new mongoose.Schema({
     orderedTime:{
         type:Date,
         required:true
+    },
+    shippingCharge:{
+        type:Number,
+        required:false
     }
 
 

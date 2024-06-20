@@ -51,7 +51,8 @@ const addToCart = async (req, res) => {
 
             let newCart = new Cart({
                 userId: userId,
-                Products: [{ productId: productID, quantity: quantity }]
+                Products: [{ productId: productID, quantity: quantity }],
+                shippingCharge:50
             });
 
             let cartAdded = await newCart.save();

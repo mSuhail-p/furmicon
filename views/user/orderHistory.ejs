@@ -220,88 +220,112 @@
             <div id="border" class="container col-sm-9 mt-5">
                 <h2 class="mb-4 text-center">Orders</h2>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="thead">
-                            <tr>
-                                <th scope="col">Image</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">view Details</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <% if (orders?.length> 0) { %>
-                                    <% orders.forEach((order, orderIndex)=> { %>
-                                        <% order.orderedProducts.forEach((product, productIndex)=> { %>
-                            <tr>
-                                <td>
-                                    <img src="/userImages/<%= product.productId?.images[0] %>" alt="Product Image"
-                                        class="table-image">
-                                </td>
-                                <td>
-                                    <a href="" class="text-dark">
-                                        <%= product.productId.name %>
-                                    </a>
-                                </td>
-                                <td>
-                                    <span id="orderStatus-<%=productIndex%>-<%=orderIndex %>"
-                                        class="table-status text-danger">
-                                        <%= product.status %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <%= order?.purchasedDate %>
-                                </td>
-                                <td>
-                                    
-                                    <button class="btn btn-primary btn-sm view-details-btn" data-toggle="modal"
-                                        data-target="#orderModal" data-product-id="<%=product._id%>"
-                                        data-product-index="<%=productIndex%>"
-                                        data-img-src="/userImages/<%=product.productId.images[0]%>"
-                                        data-name="<%=product.productId.name%>" data-cname="<%=order.userName%>"
-                                        data-quantity="<%=product.quantity%>" data-price="<%=product.price%>"
-                                        data-payment="<%=order.paymentMethod%>"
-                                        data-address-name="<%=order.shipAddress[0].name%>"
-                                        data-address-country="<%=order.shipAddress[0].country%>"
-                                        data-address-state=" <%=order.shipAddress[0].state%>"
-                                        data-address-city="<%=order.shipAddress[0].city%> "
-                                        data-address-street="<%=order.shipAddress[0].streetName%> "
-                                        data-address-pin-code="<%=order.shipAddress[0].pinCode%> "
-                                        data-address-phone=" <%=order.shipAddress[0].phone%>"
-                                        data-address-email="<%=order.shipAddress[0].email%> "
-                                        data-order-status="<%=product.status%>"
-                                        data-order-date="<%=order.purchasedDate%>">
-                                        View Details
-                                    </button>
-                                </td>
-                                <td>
-                                    <% if (product.status=="Placed" || product.status=='Shipped' ) { %>
-                                        <button
-                                            onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
-                                            class="btn btn-danger btn-sm"
-                                            id="cancelBtn-<%=productIndex%><%=orderIndex%>">Cancel</button>
-                                        <% }else if(product.status=='Delivered' ){ %>
 
-                                            <button
-                                                onclick="Return('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
-                                                class="btn btn-warning btn-sm"
-                                                id="returnBtn-<%=productIndex%>">Return</button>
 
+
+
+
+
+
+
+
+
+
+
+                    <div class="container">
+                        <% if (orders?.length> 0) { %>
+                            <% orders.forEach((order, orderIndex)=> { %>
+                                <% order.orderedProducts.forEach((product, productIndex)=> { %>
+                                    <div class="card mb-3">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col-md-2">
+                                                <img src="/userImages/<%= product.productId?.images[0] %>"
+                                                    class="card-img" alt="Product Image"
+                                                    style="width: 100px; height: 100px; object-fit: cover;">
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <h6 class="card-title">
+                                                                <a href="#" class="text-dark">
+                                                                    <%= product.productId.name %>
+                                                                </a>
+                                                            </h6>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <p class="card-text mb-0">
+                                                                <span
+                                                                    id="orderStatus-<%=productIndex%>-<%=orderIndex %>"
+                                                                    class="text-danger">
+                                                                    <%= product.status %>
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <p class="card-text mb-0">
+                                                                <%= order?.purchasedDate %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-primary btn-sm view-details-btn"
+                                                                data-toggle="modal" data-target="#orderModal"
+                                                                data-product-id="<%=product._id%>"
+                                                                data-product-index="<%=productIndex%>"
+                                                                data-img-src="/userImages/<%=product.productId.images[0]%>"
+                                                                data-name="<%=product.productId.name%>"
+                                                                data-cname="<%=order.userName%>"
+                                                                data-quantity="<%=product.quantity%>"
+                                                                data-price="<%=product.price%>"
+                                                                data-payment="<%=order.paymentMethod%>"
+                                                                data-shipping="<%=order.shippingCharge%>"
+                                                                data-address-name="<%=order.shipAddress[0].name%>"
+                                                                data-address-country="<%=order.shipAddress[0].country%>"
+                                                                data-address-state=" <%=order.shipAddress[0].state%>"
+                                                                data-address-city="<%=order.shipAddress[0].city%> "
+                                                                data-address-street="<%=order.shipAddress[0].streetName%> "
+                                                                data-address-pin-code="<%=order.shipAddress[0].pinCode%> "
+                                                                data-address-phone=" <%=order.shipAddress[0].phone%>"
+                                                                data-address-email="<%=order.shipAddress[0].email%> "
+                                                                data-order-status="<%=product.status%>"
+                                                                data-order-date="<%=order.purchasedDate%>">
+                                                                View Details
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <% if (product.status=="Placed" || product.status=='Shipped'
+                                                                ) { %>
+                                                                <button
+                                                                    onclick="cancel('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
+                                                                    class="btn btn-danger btn-sm"
+                                                                    id="cancelBtn-<%=productIndex%><%=orderIndex%>">
+                                                                    Cancel
+                                                                </button>
+                                                                <% } else if (product.status=='Delivered' ) { %>
+                                                                    <button
+                                                                        onclick="Return('<%= product._id %>', '<%= productIndex %>', '<%= orderIndex %>','<%= product.productId._id%>','<%=order._id%>')"
+                                                                        class="btn btn-warning btn-sm"
+                                                                        id="returnBtn-<%=productIndex%>">
+                                                                        Return
+                                                                    </button>
+                                                                    <a href="/getInvoice/?orderId=<%=order._id%>" class="btn btn-success btn-sm"
+                                                                        id="invoice">
+                                                                        Invoice
+                                                                    </a>
+                                                                    <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                        <% }); %>
                                             <% } %>
+                    </div>
 
-                                </td>
-                            </tr>
-                            <% }); %>
-                                <% }); %>
-                                    <% } %>
 
-                                        </tr>
-                                        <!-- Add more rows as needed -->
-                        </tbody>
-                    </table>
+ 
                 </div>
             </div>
             <!-- Include Bootstrap JS and dependencies -->
@@ -415,6 +439,7 @@
                         <div><strong>Quantity:</strong> <span id="productQuantity"></span></div>
                         <div><strong>Price:</strong> ₹<span id="productPrice"></span></div>
                         <div><strong>paymentMethod:</strong><span id="paymentMethod"></span></div>
+                        <div><strong>Shipping Charge:</strong>₹ <span id="shippingCharge"></span></div>
                     </div>
                     <hr>
                     <div class="address-info">
@@ -443,7 +468,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-       
+
         $(document).ready(function () {
             $('.view-details-btn').click(function () {
                 var button = $(this);
@@ -455,6 +480,7 @@
                 var quantity = button.data('quantity');
                 var price = button.data('price');
                 var paymentMethod = button.data('payment');
+                var shippingCharge = button.data('shipping');
                 var addressName = button.data('address-name');
                 var addressCountry = button.data('address-country');
                 var addressState = button.data('address-state');
@@ -465,8 +491,8 @@
                 var addressEmail = button.data('address-email');
                 var orderStatus = button.data('order-status');
                 var orderDate = button.data('order-date');
-                 
-               
+
+
 
                 $('#productImage').attr('src', imgSrc);
                 $('#productName').text(name);
@@ -474,6 +500,7 @@
                 $('#productQuantity').text(quantity);
                 $('#productPrice').text(price);
                 $('#paymentMethod').text(paymentMethod)
+                $('#shippingCharge').text(shippingCharge)
                 $('#addressName').text(addressName);
                 $('#addressCountry').text(addressCountry);
                 $('#addressState').text(addressState);
@@ -485,7 +512,7 @@
                 $('#orderStatus').text(orderStatus);
                 $('#orderDate').text(orderDate);
             });
-            
+
         });
 
     </script>

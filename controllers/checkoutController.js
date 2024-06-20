@@ -74,7 +74,7 @@ let placeOrder = async (req, res) => {
 
         }))
 
-        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0)
+        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0) +50
         if (coupenId != undefined) {
 
             let selectedCoupon = await Coupen.findOneAndUpdate(
@@ -99,7 +99,8 @@ let placeOrder = async (req, res) => {
                     paymentMethod: paymentMethod,
                     subTotal: subTotal,
                     orderedTime: Date(),
-                    orderStatus: status
+                    orderStatus: status,
+                    shippingCharge:50
 
 
                 })
@@ -141,7 +142,8 @@ let placeOrder = async (req, res) => {
                     paymentMethod: paymentMethod,
                     subTotal: subTotal,
                     orderedTime: Date(),
-                    orderStatus: status
+                    orderStatus: status,
+                    shippingCharge:50
 
 
                 })
@@ -185,7 +187,8 @@ let placeOrder = async (req, res) => {
                     paymentMethod: paymentMethod,
                     subTotal: subTotal,
                     orderedTime: new Date(),
-                    orderStatus: 'Placed'
+                    orderStatus: 'Placed',
+                    shippingCharge:50
 
 
                 })
@@ -226,7 +229,8 @@ let placeOrder = async (req, res) => {
                     paymentMethod: paymentMethod,
                     subTotal: subTotal,
                     orderedTime: new Date(),
-                    orderStatus: 'Placed'
+                    orderStatus: 'Placed',
+                    shippingCharge:50
 
 
                 })
@@ -359,7 +363,8 @@ const verifyPayment = async (req, res) => {
                     paymentMethod: paymentMethod,
                     subTotal: subTotal,
                     orderedTime: new Date(),
-                    orderStatus: 'Placed'
+                    orderStatus: 'Placed',
+                    shippingCharge:50
 
 
                 })
@@ -401,7 +406,8 @@ const verifyPayment = async (req, res) => {
                     paymentMethod: paymentMethod,
                     subTotal: subTotal,
                     orderedTime: new Date(),
-                    orderStatus: 'Placed'
+                    orderStatus: 'Placed',
+                    shippingCharge:50
 
 
                 })

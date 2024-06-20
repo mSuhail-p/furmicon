@@ -83,6 +83,8 @@ router.delete('/deleteCoupen/:coupenId',adminAuth.is_login,coupenController.dele
 
 //sales report
 router.get('/getSalesReport',adminAuth.is_login,orderController.getSalesReport)
+router.post('/searchWithDate',orderController.searchWithDate)
+router.get('/sortReport',orderController.sortReport)
 
 
 

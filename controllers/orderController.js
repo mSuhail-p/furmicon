@@ -70,14 +70,14 @@ let getSalesReport = async (req, res) => {
             {
                 $group: {
                     _id: "$purchasedDate",
-                    totalCount: { $sum: 1 },totalRevenue:{$sum:'$subTotal'}
+                    totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
                 }
-            },{$sort:{_id:-1}}
+            }, { $sort: { _id: -1 } }
         ]);
 
 
         console.log(report, 'it is report')
-        res.render('admin/salesReport',{report})
+        res.render('admin/salesReport', { report })
 
 
     } catch (error) {
@@ -86,9 +86,91 @@ let getSalesReport = async (req, res) => {
 }
 
 
+
+
+
+let getInvoice = async (req, res) => {
+    try {
+        let { orderId } = req.query
+        let order = await Order.find({ _id: orderId }).populate({
+            path: 'orderedProducts.productId',
+            model: 'Product'
+
+        })
+        // console.log(order[0].orderedProducts[0].productId.price)
+        // console.log(order,'it is orderi id')
+        res.render('user/Invoice', { order })
+
+
+
+    } catch (error) {
+        console.log('error rendering getInvoice:', error)
+        res.status(500).render('error', { error: 'An error occurred while rendering the getInvoice' })
+    }
+}
+
+let searchWithDate = async (req, res) => {
+    try {
+
+        let { searcheDate } = req.body
+        let searchedDate = new Date(searcheDate)
+
+
+
+        let report = await Order.aggregate([
+
+            { $match: { orderedTime: { $gt: searchedDate } } }, {
+                $group: {
+                    _id: "$purchasedDate",
+                    totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+                }
+            }, { $sort: { _id: -1 } }
+        ]);
+
+        res.render('admin/salesReport', { report })
+
+
+    } catch (error) {
+
+        console.log('error rendering searchWithDate', error)
+    }
+}
+
+
+let sortReport = async (req, res) => {
+    try {
+        let { sort } = req.query
+        if (sort == 'Day') {
+            let tody = new Date()
+
+            let report = await Order.aggregate([
+
+                { $match: { orderedTime: { $eq: tody } } }, {
+                    $group: {
+                        _id: "$purchasedDate",
+                        totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+                    }
+                }, { $sort: { _id: -1 } }
+            ])
+            console.log(report,'it is reporrt')
+
+        }
+
+
+    } catch (error) {
+
+        console.log('error rendering sortReport', error)
+    }
+}
+
+
+
 module.exports = {
 
     getOrder,
     changeOrderStatus,
-    getSalesReport
+    getSalesReport,
+    getInvoice,
+    searchWithDate,
+    sortReport
 }
