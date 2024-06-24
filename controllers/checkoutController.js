@@ -55,6 +55,7 @@ let placeOrder = async (req, res) => {
     try {
 
         let { paymentMethod, addressId, formData, coupenId } = req.body
+        console.log('it is place order')
         console.log(coupenId, 'it is coupencode')
         const { user_id } = req.session
         const userCart = await Cart.findOne({ userId: user_id }).populate('Products.productId')
@@ -74,7 +75,7 @@ let placeOrder = async (req, res) => {
 
         }))
 
-        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0) +50
+        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0) + 50
         if (coupenId != undefined) {
 
             let selectedCoupon = await Coupen.findOneAndUpdate(
@@ -100,7 +101,7 @@ let placeOrder = async (req, res) => {
                     subTotal: subTotal,
                     orderedTime: Date(),
                     orderStatus: status,
-                    shippingCharge:50
+                    shippingCharge: 50
 
 
                 })
@@ -143,7 +144,7 @@ let placeOrder = async (req, res) => {
                     subTotal: subTotal,
                     orderedTime: Date(),
                     orderStatus: status,
-                    shippingCharge:50
+                    shippingCharge: 50
 
 
                 })
@@ -169,7 +170,7 @@ let placeOrder = async (req, res) => {
                 currency: "INR",
                 receipt: "receipt#1",
 
-            }, (err,order) => {
+            }, (err, order) => {
                 console.log(err, "it is error ")
                 console.log(order, "it is razor pay ")
                 res.json({ order, orderData })
@@ -188,7 +189,7 @@ let placeOrder = async (req, res) => {
                     subTotal: subTotal,
                     orderedTime: new Date(),
                     orderStatus: 'Placed',
-                    shippingCharge:50
+                    shippingCharge: 50
 
 
                 })
@@ -230,7 +231,7 @@ let placeOrder = async (req, res) => {
                     subTotal: subTotal,
                     orderedTime: new Date(),
                     orderStatus: 'Placed',
-                    shippingCharge:50
+                    shippingCharge: 50
 
 
                 })
@@ -284,7 +285,7 @@ let placeOrder = async (req, res) => {
         if (status == 'Placed') {
             for (const item of productItems) {
                 await Product.updateOne({ _id: item.productId },
-                    { $inc: { quantity: -item.quantity } }
+                    { $inc: { quantity: -item.quantity, salesCount: +1 } }
                 )
 
             }
@@ -330,117 +331,146 @@ const verifyPayment = async (req, res) => {
 
         // Compare the signatures
         if (generated_signature === razorpay_signature) {
-            console.log("Order placed successfully");
+            if (req.body.orderId) {
+                 
+                let updateRetry = await Order.updateOne({
+                    _id: req.body.orderId,
+                    'orderedProducts._id': req.body.productId
+                }, {
+                    $set:
+                    {
+                        purchasedDate: new Date().toDateString(),
+                        orderStatus: 'Placed',
+                        orderedTime: new Date(),
+                        'orderedProducts.$.status': 'Placed'
 
 
-            const { addressId, paymentMethod, formData } = req.body.orderData
-            console.log(addressId, paymentMethod, formData, "it is oreder data")
-
-            const { user_id } = req.session
-            const userCart = await Cart.findOne({ userId: user_id }).populate('Products.productId')
-            let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0)
-
-
-            let productItems = userCart.Products.map((product) => ({
-                productId: product.productId,
-                quantity: product.quantity,
-                price: product.productId.offerPrice,
-                totalPrice: product.productId.price * product.quantity,
-                status: 'Placed'
-
-            }))
-
-
-            if (addressId != undefined) {
-                let selectedAddress = await Address.findOne({})
-
-                let storeOrder = new Order({
-                    userId: user_id,
-                    userName: selectedAddress.firstName,
-                    shipAddress: [{ name: selectedAddress.firstName, country: selectedAddress.country, state: selectedAddress.state, city: selectedAddress.town, streetName: selectedAddress.streetName, pinCode: selectedAddress.postCode, phone: selectedAddress.phone, email: selectedAddress.email }],
-                    orderedProducts: productItems,
-                    purchasedDate: new Date().toDateString(),
-                    paymentMethod: paymentMethod,
-                    subTotal: subTotal,
-                    orderedTime: new Date(),
-                    orderStatus: 'Placed',
-                    shippingCharge:50
-
-
+                    }
                 })
+                
+                res.json({retry:true})
 
-                let resultofOrder = await storeOrder.save()
-                const orderId = resultofOrder._id
-                orderPlaced(orderId)
-
-
-
-
-
-
+ 
             } else {
-                console.log(formData, "it is form data")
-                let createAdress = new Address({
-                    userId: user_id,
-                    firstName: formData.firstname,
-                    lastName: formData.lastname,
-                    country: formData.country,
-                    streetName: formData.streetname,
-                    town: formData.town,
-                    state: formData.state,
-                    postCode: formData.postcode,
-                    phone: formData.phone,
-                    email: formData.mail
-
-                })
-
-                let newAddress = await createAdress.save()
 
 
-                let storeOrder = new Order({
-                    userId: user_id,
-                    userName: newAddress.firstName,
-                    shipAddress: [{ name: newAddress.firstName, country: newAddress.country, state: newAddress.state, city: newAddress.town, streetName: newAddress.streetName, pinCode: newAddress.postCode, phone: newAddress.phone, email: newAddress.email }],
-                    orderedProducts: productItems,
-                    purchasedDate: new Date().toDateString(),
-                    paymentMethod: paymentMethod,
-                    subTotal: subTotal,
-                    orderedTime: new Date(),
-                    orderStatus: 'Placed',
-                    shippingCharge:50
+                console.log("Order placed successfully");
 
 
-                })
-
-                let resultofOrder = await storeOrder.save()
-                const orderId = resultofOrder._id
-                console.log(resultofOrder, 'it is form formdata')
-                orderPlaced(orderId)
+                const { addressId, paymentMethod, formData } = req.body.orderData
 
 
-            }
-            async function orderPlaced(orderId) {
+                const { user_id } = req.session
+                const userCart = await Cart.findOne({ userId: user_id }).populate('Products.productId')
+                let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0)
 
-                for (const item of productItems) {
-                    await Product.updateOne({ _id: item.productId },
-                        { $inc: { quantity: -item.quantity } }
-                    )
+
+                let productItems = userCart.Products.map((product) => ({
+                    productId: product.productId,
+                    quantity: product.quantity,
+                    price: product.productId.offerPrice,
+                    totalPrice: product.productId.price * product.quantity,
+                    status: 'Placed'
+
+                }))
+
+
+                if (addressId != undefined) {
+                    let selectedAddress = await Address.findOne({ _id: addressId })
+
+                    let storeOrder = new Order({
+                        userId: user_id,
+                        userName: selectedAddress.firstName,
+                        shipAddress: [{ name: selectedAddress.firstName, country: selectedAddress.country, state: selectedAddress.state, city: selectedAddress.town, streetName: selectedAddress.streetName, pinCode: selectedAddress.postCode, phone: selectedAddress.phone, email: selectedAddress.email }],
+                        orderedProducts: productItems,
+                        purchasedDate: new Date().toDateString(),
+                        paymentMethod: paymentMethod,
+                        subTotal: subTotal,
+                        orderedTime: new Date(),
+                        orderStatus: 'Placed',
+                        shippingCharge: 50
+
+
+                    })
+
+                    let resultofOrder = await storeOrder.save()
+                    const orderId = resultofOrder._id
+                    orderPlaced(orderId)
+
+
+
+
+
+
+                } else {
+                    console.log(formData, "it is form data")
+                    let createAdress = new Address({
+                        userId: user_id,
+                        firstName: formData.firstname,
+                        lastName: formData.lastname,
+                        country: formData.country,
+                        streetName: formData.streetname,
+                        town: formData.town,
+                        state: formData.state,
+                        postCode: formData.postcode,
+                        phone: formData.phone,
+                        email: formData.mail
+
+                    })
+
+                    let newAddress = await createAdress.save()
+
+
+                    let storeOrder = new Order({
+                        userId: user_id,
+                        userName: newAddress.firstName,
+                        shipAddress: [{ name: newAddress.firstName, country: newAddress.country, state: newAddress.state, city: newAddress.town, streetName: newAddress.streetName, pinCode: newAddress.postCode, phone: newAddress.phone, email: newAddress.email }],
+                        orderedProducts: productItems,
+                        purchasedDate: new Date().toDateString(),
+                        paymentMethod: paymentMethod,
+                        subTotal: subTotal,
+                        orderedTime: new Date(),
+                        orderStatus: 'Placed',
+                        shippingCharge: 50
+
+
+                    })
+
+                    let resultofOrder = await storeOrder.save()
+                    const orderId = resultofOrder._id
+                    console.log(resultofOrder, 'it is form formdata')
+                    orderPlaced(orderId)
+
 
                 }
+                async function orderPlaced(orderId) {
 
-                //Aftet placing order , delete cart document
-                await Cart.deleteOne({ userId: user_id })
-                console.log('quanitry decreased')
+                    for (const item of productItems) {
+                        await Product.updateOne({ _id: item.productId },
+                            { $inc: { quantity: -item.quantity, salesCount: +1 } }
+                        )
+
+                    }
+
+                    //Aftet placing order , delete cart document
+                    await Cart.deleteOne({ userId: user_id })
+                    console.log('quanitry decreased')
 
 
 
-                res.status(200).json({ Success: true, orderId })
+                    res.status(200).json({ Success: true, orderId })
+                }
+
             }
 
 
         } else {
             console.log("Signature verification failed");
         }
+
+
+
+
 
 
 
@@ -451,6 +481,109 @@ const verifyPayment = async (req, res) => {
 }
 
 
+const failedPayment = async (req, res) => {
+
+    try {
+
+        const userCart = await Cart.findOne({ userId: req.session.user_id }).populate('Products.productId')
+        const { order, orderData } = req.body
+
+        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0)
+
+
+        let productItems = userCart.Products.map((product) => ({
+            productId: product.productId,
+            quantity: product.quantity,
+            price: product.productId.offerPrice,
+            totalPrice: product.productId.price * product.quantity,
+            status: 'Failed'
+
+        }))
+        console.log(orderData.addressId, 'it is addressID')
+        if (orderData.addressId != undefined) {
+            let selectedAddress = await Address.findOne({ _id: orderData.addressId })
+
+            let storeOrder = new Order({
+                userId: req.session.user_id,
+                userName: selectedAddress.firstName,
+                shipAddress: [{ name: selectedAddress.firstName, country: selectedAddress.country, state: selectedAddress.state, city: selectedAddress.town, streetName: selectedAddress.streetName, pinCode: selectedAddress.postCode, phone: selectedAddress.phone, email: selectedAddress.email }],
+                orderedProducts: productItems,
+                purchasedDate: new Date().toDateString(),
+                paymentMethod: orderData.paymentMethod,
+                subTotal: subTotal,
+                orderedTime: new Date(),
+                orderStatus: 'Failed',
+                shippingCharge: 50
+
+
+            })
+
+            let resultofOrder = await storeOrder.save()
+            // const orderId = resultofOrder._id
+            // orderPlaced(orderId)
+            res.json({ failed: true })
+
+
+
+
+
+        } else {
+
+            console.log(orderData.formData, "it is form data")
+            let createAdress = new Address({
+                userId: req.session.user_id,
+                firstName: orderData.formData.firstname,
+                lastName: orderData.formData.lastname,
+                country: orderData.formData.country,
+                streetName: orderData.formData.streetname,
+                town: orderData.formData.town,
+                state: orderData.formData.state,
+                postCode: orderData.formData.postcode,
+                phone: orderData.formData.phone,
+                email: orderData.formData.mail
+
+            })
+
+            let newAddress = await createAdress.save()
+
+
+            let storeOrder = new Order({
+                userId: req.session.user_id,
+                userName: newAddress.firstName,
+                shipAddress: [{ name: newAddress.firstName, country: newAddress.country, state: newAddress.state, city: newAddress.town, streetName: newAddress.streetName, pinCode: newAddress.postCode, phone: newAddress.phone, email: newAddress.email }],
+                orderedProducts: productItems,
+                purchasedDate: new Date().toDateString(),
+                paymentMethod: orderData.paymentMethod,
+                subTotal: subTotal,
+                orderedTime: new Date(),
+                orderStatus: 'Failed',
+                shippingCharge: 50
+
+
+            })
+
+            let resultofOrder = await storeOrder.save()
+
+            console.log(resultofOrder, 'it is form formdata')
+            res.json({ failed: true })
+
+
+        }
+
+
+
+
+
+
+
+
+    } catch (error) {
+        console.log('error rendering failed payment:', error);
+    }
+
+}
+
+
 
 
 
@@ -458,6 +591,7 @@ module.exports = {
     getCheckout,
     placeOrder,
     orderPlaced,
-    verifyPayment
+    verifyPayment,
+    failedPayment
 
 }

@@ -77,27 +77,158 @@ const dashboad = async (req, res) => {
         let productCount = await Product.find().count()
         let categoryCount = await Category.find().count()
 
-        let counts = [productCount,categoryCount]
+        let counts = [productCount, categoryCount]
 
         let orders = await Order.aggregate([
             {
                 $match: { orderStatus: { $ne: 'Cancelled' } }
-            },{$group:{_id:'',count:{$sum:1},totalRevenue:{$sum:'$subTotal'}}}
+            }, { $group: { _id: '', count: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' } } }
         ])
 
-        console.log(orders, 'it is orders')
+
+        let orderMonth = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'Cancelled' } } },
+            {
+                $group: {
+                    _id: {
+                        month: { $month: '$orderedTime' }
+                    }, totalIncome: { $sum: '$subTotal' }
+                }
+            },
+            {
+                $addFields: {
+                    monthName: {
+                        $arrayElemAt: [
+                            ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                            { $subtract: ["$_id.month", 1] }
+                        ]
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: '$_id.month',
+                    totalIncome: 1,
+                    monthName: 1
+                }
+            }
+        ])
+
+
+        let orderYear = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'Cancelled' } } },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: '$orderedTime' },
+                    }, totalIncome: { $sum: '$subTotal' }
+                }
+            }
+
+        ])
+
+
+         
+
+
+
+        let bestProduct = await Order.aggregate([
+
+            { $unwind: '$orderedProducts' },
+
+            {
+                $group: {
+                    _id: '$orderedProducts.productId',
+                    totalCount: { $sum: '$orderedProducts.quantity' } // Sum the quantities ordered
+                }
+            },
+
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+
+            { $unwind: '$product' },
+
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'product.category',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+
+            { $unwind: '$category' },
+
+            {
+                $project: {
+                    _id: 1,
+                    totalCount: 1,
+                    'product.name': 1,
+                    'category.name': 1,
+                    'product.images':1,
+                    'product.quantity':1
+                }
+            },
+
+            { $sort: { totalCount: -1 } },
+            {$limit:5}
+        ])
 
 
 
 
-        res.render('admin/dashboad.ejs',{orders,counts});
+        let bestCategory = await Order.aggregate([
+            { $unwind: '$orderedProducts' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'orderedProducts.productId', // Correct field
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            { $unwind: '$product' },
+            {
+                $group: {
+                    _id: '$product.category', // Correctly reference the product category
+                    totalCategoryCount: { $sum: 1 } // Summing the quantities
+                }
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: '_id', // Correct field
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            { $unwind: '$category' },
+            {$project:{_id:1,'category.name':1,totalCategoryCount:1}},
+            { $sort: { totalCategoryCount: -1 } }, // Correct field
+            { $limit: 5 }
+        ])
+        
+
+        console.log(bestCategory , 'it is best category')
+
+        // let bestCategory = bestProduct.aggregate([
+        //     {$group:{_id:'$product.category',totalCount:{$sum:1}}}
+        // ])
+
+
+
+
+        res.render('admin/dashboad.ejs', { orders, counts, orderMonth, orderYear , bestProduct ,bestCategory });
     } catch (error) {
         console.log(error);
     }
 }
-
-
-
 
 
 

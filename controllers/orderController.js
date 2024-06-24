@@ -63,8 +63,7 @@ const changeOrderStatus = async (req, res) => {
 
 let getSalesReport = async (req, res) => {
     try {
-        let order = await Order.find({})
-        console.log(order)
+
         let report = await Order.aggregate([
 
             {
@@ -72,11 +71,19 @@ let getSalesReport = async (req, res) => {
                     _id: "$purchasedDate",
                     totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
                 }
-            }, { $sort: { _id: -1 } }
+            },
+
+            {
+                $addFields: {
+                    purchasedDateAsDate: {
+                        $toDate: "$_id"
+                    }
+                }
+            }, { $sort: { purchasedDateAsDate: -1 } }
         ]);
 
 
-        console.log(report, 'it is report')
+
         res.render('admin/salesReport', { report })
 
 
@@ -113,6 +120,7 @@ let searchWithDate = async (req, res) => {
     try {
 
         let { searcheDate } = req.body
+
         let searchedDate = new Date(searcheDate)
 
 
@@ -124,7 +132,16 @@ let searchWithDate = async (req, res) => {
                     _id: "$purchasedDate",
                     totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
                 }
-            }, { $sort: { _id: -1 } }
+            },
+            {
+                $addFields: {
+                    purchasedDateAsDate: {
+                        $toDate: "$_id"
+                    }
+                }
+            },
+            
+            { $sort: { purchasedDateAsDate: -1 } }
         ]);
 
         res.render('admin/salesReport', { report })
@@ -140,21 +157,91 @@ let searchWithDate = async (req, res) => {
 let sortReport = async (req, res) => {
     try {
         let { sort } = req.query
+        console.log(sort, 'it is searchdate')
         if (sort == 'Day') {
-            let tody = new Date()
+            console.log('it is inside the day ')
+            let today = new Date()
+            console.log(today)
 
             let report = await Order.aggregate([
+                {
+                    $match: {
+                        orderedTime: { $gte: today }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$purchasedDate",
+                        totalCount: { $sum: 1 },
+                        totalRevenue: { $sum: '$subTotal' }
+                    }
+                }
+            ]);
+            console.log(report, 'it is dayaaaaaa')
 
-                { $match: { orderedTime: { $eq: tody } } }, {
+            res.render('admin/salesReport', { report })
+        } else if (sort == 'Month') {
+
+            let today = new Date();
+            let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            console.log(startOfMonth, 'it is start of the month')
+            let report = await Order.aggregate([
+
+                { $match: { orderedTime: { $gt: startOfMonth } } }, {
                     $group: {
                         _id: "$purchasedDate",
                         totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
                     }
-                }, { $sort: { _id: -1 } }
-            ])
-            console.log(report,'it is reporrt')
+                },
+                {
+                    $addFields: {
+                        purchasedDateAsDate: {
+                            $toDate: "$_id"
+                        }
+                    }
+                }, { $sort: { purchasedDateAsDate: -1 } }
+            ]);
+
+            console.log(report, 'its mongth')
+
+            res.render('admin/salesReport', { report })
+
+
+
+
+
+
+
+
+        } else if (sort == 'Year') {
+
+
+            let today = new Date();
+            let startOfYear = new Date(today.getFullYear(), 0, 1);
+            console.log(startOfYear, 'it is start of the month')
+            let report = await Order.aggregate([
+
+                { $match: { orderedTime: { $gte: startOfYear } } }, {
+                    $group: {
+                        _id: "$purchasedDate",
+                        totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+                    }
+                },
+                {
+                    $addFields: {
+                        purchasedDateAsDate: {
+                            $toDate: "$_id"
+                        }
+                    }
+                }, { $sort: { purchasedDateAsDate: -1 } }
+            ]);
+
+            console.log(report, 'it is years')
+
+            res.render('admin/salesReport', { report })
 
         }
+
 
 
     } catch (error) {

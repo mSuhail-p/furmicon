@@ -873,8 +873,22 @@
 
                 // Add error handling for payment failure
                 rzp1.on('payment.failed', function (response) {
-                    console.log("Payment failed. Response:", response.error);
-                    alert(`Payment failed: ${response.error.description}`);
+
+
+                    const data = {
+                        order,
+                        orderData
+                    }
+                    axios.post('/failedPayment', data)
+                        .then(response => {
+                            if (response.data.failed) {
+                                console.log('this is payment failed')
+                                window.location.href = `/getOrder`
+                            }
+                        })
+                        .catch(error => {
+                            console.log("payment failed  error:", error);
+                        });
                 });
 
                 rzp1.open();

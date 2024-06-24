@@ -72,6 +72,7 @@ router.get('/getCheckout', auth.cart, checkoutController.getCheckout)
 router.post('/placeOrder', auth.cart, checkoutController.placeOrder)
 router.get('/orderPlaced/:orderId', auth.cart, checkoutController.orderPlaced)
 router.post('/verifyPayment', auth.cart, checkoutController.verifyPayment)
+router.post('/failedPayment',auth.cart,checkoutController.failedPayment)
 
 
 //Coupen

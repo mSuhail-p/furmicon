@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -308,11 +309,19 @@
                                                                         id="returnBtn-<%=productIndex%>">
                                                                         Return
                                                                     </button>
-                                                                    <a href="/getInvoice/?orderId=<%=order._id%>" class="btn btn-success btn-sm"
-                                                                        id="invoice">
+                                                                    <a href="/getInvoice/?orderId=<%=order._id%>"
+                                                                        class="btn btn-success btn-sm" id="invoice">
                                                                         Invoice
                                                                     </a>
-                                                                    <% } %>
+                                                                    <% }else if(product.status=='Failed' ){ %>
+
+                                                                        <button
+                                                                            onclick="retry('<%=product.price%>','<%=order._id%>','<%=product._id%>')"
+                                                                            class="btn btn-info btn-sm">
+                                                                            Retry
+                                                                        </button>
+
+                                                                        <% } %>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -325,12 +334,109 @@
                     </div>
 
 
- 
+
                 </div>
             </div>
             <!-- Include Bootstrap JS and dependencies -->
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+            <script>
+
+
+
+                function retry(price, orderId, productId) {
+
+                    let amount = price + 50
+
+                    const data = {
+                        paymentMethod: 'Online Payment',
+
+                    }
+
+
+                    axios.post('/placeOrder', data)
+                        .then(response => {
+                            razorpayPayment(response.data.order, response.data.orderData, amount, orderId, productId);
+
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+
+
+
+                }
+
+
+
+                function razorpayPayment(order, orderData, amount, orderId, productId) {
+                    console.log("here is reached, razorpayPayment");
+                    var options = {
+                        "key": "rzp_test_m31KrIXyLXS9oV", // Enter the Key ID generated from the Dashboard
+                        "amount": amount, // Amount is in currency subunits. Multiply by 100 for paise if order.amount is in INR
+                        "currency": "INR",
+                        "name": "Furmicon", // Your business name
+                        "description": "Quality is never compromised",
+                        "order_id": order.id, // This is a sample Order ID. Pass the id obtained in the response of Step 1
+                        "handler": function (response) {
+                            console.log("Payment successful. Response:", response);
+
+                            const data = {
+                                response,
+                                order,
+                                orderData,
+                                orderId,
+                                productId
+
+                            };
+
+                            axios.post('/verifyPayment', data)
+                                .then(response => {
+                                    if (response.data.retry) {
+                                        window.location.href = `/getOrder`
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log("Verification error:", error);
+                                });
+                        },
+                        "prefill": { // We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+                            "name": "Gaurav Kumar", // Your customer's name
+                            "email": "gaurav.kumar@example.com",
+                            "contact": "9000090000" // Provide the customer's phone number for better conversion rates 
+                        },
+                        "notes": {
+                            "address": "Razorpay Corporate Office"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+
+                    // Initialize Razorpay payment
+                    var rzp1 = new Razorpay(options);
+
+                    // Add error handling for payment failure
+                    rzp1.on('payment.failed', function (response) {
+
+                        window.location.href = '/getOrder'
+
+
+
+                    });
+
+                    rzp1.open();
+                }
+
+
+
+
+
+
+            </script>
 
             <script>
 

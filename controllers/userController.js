@@ -678,9 +678,7 @@ const googleAuth = async (req, res) => {
             res.redirect('/')
 
         } else {
-            console.log(req.user.name.givenName)
-            console.log(req.user.email)
-            console.log(req.user.id)
+          
 
             const googleRegister = new User({
                 username: req.user.name.givenName,
@@ -689,7 +687,16 @@ const googleAuth = async (req, res) => {
                 is_verified: 1
             })
 
+ 
             let googledoc = await googleRegister.save()
+
+            //create wallet
+
+            let createWallet = new Wallet({
+                balance: 0,
+                userId: googledoc._id,
+            })
+            await createWallet.save()
             // req.session.user_id = req.user._id
             req.session.user_id = googledoc._id
             console.log(req.session.user_id)
