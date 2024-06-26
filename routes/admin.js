@@ -56,16 +56,16 @@ router.get('/changeStatus/:productId/:status/:exactProductId', adminAuth.is_logi
 
 //USERLIST
 router.get('/costomer', adminAuth.is_login, adminController.userlist)
-router.get('/userblock/:userId', adminController.userBlock);
+router.get('/userblock/:userId',adminAuth.is_login, adminController.userBlock);
 
 
 //CATEGARY
 router.get('/category', adminAuth.is_login, adminController.loadCategory)
-router.post('/addCategory', adminController.addCategory)
-router.get('/editCategory/:categoryId', adminController.editCategoryLoad);
-router.put('/editingCategory/:catergory_id', adminController.editingCategory)
-router.get('/deleteCategory/:category', adminController.deleteCategory)
-router.patch('/saveCategoryOffer/:catOfferId/:categoryId', adminController.saveCategoryOffer)
+router.post('/addCategory', adminAuth.is_login,adminController.addCategory)
+router.get('/editCategory/:categoryId',adminAuth.is_login, adminController.editCategoryLoad);
+router.put('/editingCategory/:catergory_id',adminAuth.is_login, adminController.editingCategory)
+router.get('/deleteCategory/:category',adminAuth.is_login, adminController.deleteCategory)
+router.patch('/saveCategoryOffer/:catOfferId/:categoryId',adminAuth.is_login, adminController.saveCategoryOffer)
 
 
 
@@ -73,18 +73,21 @@ router.patch('/saveCategoryOffer/:catOfferId/:categoryId', adminController.saveC
 router.get('/offer', adminAuth.is_login,adminAuth.is_login,offerContoller.getOffer)
 router.post('/addOffer',adminAuth.is_login, adminAuth.is_login,offerContoller.addOffer)
 router.delete('/deleteOffer/:offerId',adminAuth.is_login,adminAuth.is_login, offerContoller.deleteOffer)
-router.get('/editOffer',offerContoller.editOffer)
-router.patch('/editOffer',offerContoller.editingOffer)
+router.get('/editOffer',adminAuth.is_login,offerContoller.editOffer)
+router.patch('/editOffer',adminAuth.is_login,offerContoller.editingOffer)
 
 //coupen
 router.get('/getCoupen',adminAuth.is_login,coupenController.getCoupen)
 router.post('/addCoupen',adminAuth.is_login,coupenController.addCoupen)
 router.delete('/deleteCoupen/:coupenId',adminAuth.is_login,coupenController.deleteCoupen)
+router.get('/getEditCoupen',coupenController.getEditCoupen)
+router.post('/editCoupen',coupenController.editCoupen)
 
 //sales report
 router.get('/getSalesReport',adminAuth.is_login,orderController.getSalesReport)
-router.post('/searchWithDate',orderController.searchWithDate)
-router.get('/sortReport',orderController.sortReport)
+router.post('/searchWithDate',adminAuth.is_login,orderController.searchWithDate)
+router.get('/sortReport',adminAuth.is_login,orderController.sortReport)
+
 
 
 

@@ -289,6 +289,7 @@
                                                                 data-address-phone=" <%=order.shipAddress[0].phone%>"
                                                                 data-address-email="<%=order.shipAddress[0].email%> "
                                                                 data-order-status="<%=product.status%>"
+                                                                data-order-id="<%=order._id%>"
                                                                 data-order-date="<%=order.purchasedDate%>">
                                                                 View Details
                                                             </button>
@@ -538,8 +539,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="order-info">
+
                         <div><strong>Product Image:</strong><br><img src="" id="productImage" alt="Product Image"
                                 class="img-thumbnail"></div>
+                        <div><strong>Invoice Number:</strong><span id="invoiceNumber"></span></div>
                         <div><strong>Product Name:</strong><span id="productName"></span></div>
                         <div><strong>Customer Name:</strong><span id="customerName"></span></div>
                         <div><strong>Quantity:</strong> <span id="productQuantity"></span></div>
@@ -596,12 +599,15 @@
                 var addressPhone = button.data('address-phone');
                 var addressEmail = button.data('address-email');
                 var orderStatus = button.data('order-status');
+                var invoiceId = button.data('order-id')
                 var orderDate = button.data('order-date');
-
-
+                console.log(invoiceId,'it is invoice')
+                
+                
 
                 $('#productImage').attr('src', imgSrc);
                 $('#productName').text(name);
+                $('#invoiceNumber').text(invoiceId);
                 $('#customerName').text(cname);
                 $('#productQuantity').text(quantity);
                 $('#productPrice').text(price);

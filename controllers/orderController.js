@@ -64,23 +64,25 @@ const changeOrderStatus = async (req, res) => {
 let getSalesReport = async (req, res) => {
     try {
 
-        let report = await Order.aggregate([
+        // let report = await Order.aggregate([
 
-            {
-                $group: {
-                    _id: "$purchasedDate",
-                    totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
-                }
-            },
+        //     {
+        //         $group: {
+        //             _id: "$purchasedDate",
+        //             totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+        //         }
+        //     },
 
-            {
-                $addFields: {
-                    purchasedDateAsDate: {
-                        $toDate: "$_id"
-                    }
-                }
-            }, { $sort: { purchasedDateAsDate: -1 } }
-        ]);
+        //     {
+        //         $addFields: {
+        //             purchasedDateAsDate: {
+        //                 $toDate: "$_id"
+        //             }
+        //         }
+        //     }, { $sort: { purchasedDateAsDate: -1 } }
+        // ]);
+        let report = await Order.find().sort({ orderedTime: -1 })
+        console.log(report, 'it is reoprt')
 
 
 
@@ -125,24 +127,26 @@ let searchWithDate = async (req, res) => {
 
 
 
-        let report = await Order.aggregate([
+        // let report = await Order.aggregate([
 
-            { $match: { orderedTime: { $gt: searchedDate } } }, {
-                $group: {
-                    _id: "$purchasedDate",
-                    totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
-                }
-            },
-            {
-                $addFields: {
-                    purchasedDateAsDate: {
-                        $toDate: "$_id"
-                    }
-                }
-            },
-            
-            { $sort: { purchasedDateAsDate: -1 } }
-        ]);
+        //     { $match: { orderedTime: { $gt: searchedDate } } }, {
+        //         $group: {
+        //             _id: "$purchasedDate",
+        //             totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+        //         }
+        //     },
+        //     {
+        //         $addFields: {
+        //             purchasedDateAsDate: {
+        //                 $toDate: "$_id"
+        //             }
+        //         }
+        //     },
+
+        //     { $sort: { purchasedDateAsDate: -1 } }
+        // ]);
+        let report = await Order.find({ orderedTime: { $gt: searchedDate } }).sort({ orderedTime: -1 })
+
 
         res.render('admin/salesReport', { report })
 
@@ -161,47 +165,48 @@ let sortReport = async (req, res) => {
         if (sort == 'Day') {
             console.log('it is inside the day ')
             let today = new Date()
-            console.log(today)
+            // console.log(today)
 
-            let report = await Order.aggregate([
-                {
-                    $match: {
-                        orderedTime: { $gte: today }
-                    }
-                },
-                {
-                    $group: {
-                        _id: "$purchasedDate",
-                        totalCount: { $sum: 1 },
-                        totalRevenue: { $sum: '$subTotal' }
-                    }
-                }
-            ]);
-            console.log(report, 'it is dayaaaaaa')
+            // let report = await Order.aggregate([
+            //     {
+            //         $match: {
+            //             orderedTime: { $gte: today }
+            //         }
+            //     },
+            //     {
+            //         $group: {
+            //             _id: "$purchasedDate",
+            //             totalCount: { $sum: 1 },
+            //             totalRevenue: { $sum: '$subTotal' }
+            //         }
+            //     }
+            // ]);
+            // console.log(report, 'it is dayaaaaaa')
+            let report = await Order.find({ orderedTime: { $gte: today } })
 
             res.render('admin/salesReport', { report })
         } else if (sort == 'Month') {
 
             let today = new Date();
             let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            console.log(startOfMonth, 'it is start of the month')
-            let report = await Order.aggregate([
+            // console.log(startOfMonth, 'it is start of the month')
+            // let report = await Order.aggregate([
 
-                { $match: { orderedTime: { $gt: startOfMonth } } }, {
-                    $group: {
-                        _id: "$purchasedDate",
-                        totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
-                    }
-                },
-                {
-                    $addFields: {
-                        purchasedDateAsDate: {
-                            $toDate: "$_id"
-                        }
-                    }
-                }, { $sort: { purchasedDateAsDate: -1 } }
-            ]);
-
+            //     { $match: { orderedTime: { $gt: startOfMonth } } }, {
+            //         $group: {
+            //             _id: "$purchasedDate",
+            //             totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+            //         }
+            //     },
+            //     {
+            //         $addFields: {
+            //             purchasedDateAsDate: {
+            //                 $toDate: "$_id"
+            //             }
+            //         }
+            //     }, { $sort: { purchasedDateAsDate: -1 } }
+            // ]);
+            let report = await Order.find({ orderedTime: { $gte: startOfMonth } }).sort({ orderedTime: -1 })
             console.log(report, 'its mongth')
 
             res.render('admin/salesReport', { report })
@@ -218,24 +223,24 @@ let sortReport = async (req, res) => {
 
             let today = new Date();
             let startOfYear = new Date(today.getFullYear(), 0, 1);
-            console.log(startOfYear, 'it is start of the month')
-            let report = await Order.aggregate([
+            // console.log(startOfYear, 'it is start of the month')
+            // let report = await Order.aggregate([
 
-                { $match: { orderedTime: { $gte: startOfYear } } }, {
-                    $group: {
-                        _id: "$purchasedDate",
-                        totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
-                    }
-                },
-                {
-                    $addFields: {
-                        purchasedDateAsDate: {
-                            $toDate: "$_id"
-                        }
-                    }
-                }, { $sort: { purchasedDateAsDate: -1 } }
-            ]);
-
+            //     { $match: { orderedTime: { $gte: startOfYear } } }, {
+            //         $group: {
+            //             _id: "$purchasedDate",
+            //             totalCount: { $sum: 1 }, totalRevenue: { $sum: '$subTotal' }
+            //         }
+            //     },
+            //     {
+            //         $addFields: {
+            //             purchasedDateAsDate: {
+            //                 $toDate: "$_id"
+            //             }
+            //         }
+            //     }, { $sort: { purchasedDateAsDate: -1 } }
+            // ]);
+            let report = await Order.find({ orderedTime: { $gt: startOfYear } }).sort({ orderedTime: -1 })
             console.log(report, 'it is years')
 
             res.render('admin/salesReport', { report })

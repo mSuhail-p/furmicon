@@ -29,7 +29,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" />
+                <span style="color: #c96; font-size:x-large;">FurniFusion</span>
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"><i
@@ -287,11 +287,10 @@
                                             <td class="text-end">
                                                 <!-- <a href="#" class="btn btn-md rounded font-sm">Detail</a> -->
 
-                                                <button type="button"
-                                                    class="btn btn-light rounded btn-sm font-sm border"
-                                                    data-bs-toggle="modal" data-bs-target="#addCoupeModal">
+                                                <a href="/admin/getEditCoupen/?coupenId=<%=element._id%>" class="btn btn-light rounded btn-sm font-sm border"
+                                                   >
                                                     Edit
-                                                </button>
+                                                </a>
                                                 <button onclick="deleteCoupen('<%=element._id%>','<%=index%>')"
                                                     class=" btn-sm font-sm border">Delete
                                                 </button>
@@ -470,65 +469,65 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#coupenForm').on('submit', function (event) {
-                event.preventDefault();
-                let isValid = true;
+        <script>
+            $(document).ready(function () {
+                $('#coupenForm').on('submit', function (event) {
+                    event.preventDefault();
+                    let isValid = true;
 
-                // Validate coupen Name
-                if (!$('#coupenname').val().trim()) {
-                    isValid = false;
-                    $('#coupennameError').text('Coupen name  is required.');
-                } else {
-                    $('#coupennameError').text('');
-                }
+                    // Validate coupen Name
+                    if (!$('#coupenname').val().trim()) {
+                        isValid = false;
+                        $('#coupennameError').text('Coupen name  is required.');
+                    } else {
+                        $('#coupennameError').text('');
+                    }
 
-                // Validate coupen code
-                if (!$('#coupenCode').val().trim()) {
-                    isValid = false;
-                    $('#coupenCodeError').text('Coupen code is required.');
-                } else {
-                    $('#coupenCodeError').text('');
-                }
+                    // Validate coupen code
+                    if (!$('#coupenCode').val().trim()) {
+                        isValid = false;
+                        $('#coupenCodeError').text('Coupen code is required.');
+                    } else {
+                        $('#coupenCodeError').text('');
+                    }
 
-                // Validate coupen discount
-                let percentage = $('#discount').val()
-                if (percentage > 100) {
-                    isValid = false;
-                    $('#discountError').text('must be under the 100');
-                } else if (!percentage.trim()) {
-                    isValid = false;
-                    $('#discountError').text('discount is required.');
+                    // Validate coupen discount
+                    let percentage = $('#discount').val()
+                    if (percentage > 100) {
+                        isValid = false;
+                        $('#discountError').text('must be under the 100');
+                    } else if (!percentage.trim()) {
+                        isValid = false;
+                        $('#discountError').text('discount is required.');
 
-                } else if (percentage < 0) {
-                    isValid = false;
-                    $('#discountError').text('must be above the 0');
-                } else {
-                    $('#discountError').text('');
-                }
+                    } else if (percentage < 0) {
+                        isValid = false;
+                        $('#discountError').text('must be above the 0');
+                    } else {
+                        $('#discountError').text('');
+                    }
 
-                // Validate Offer expiryDate
-                let today = new Date().date
-                console.log(today)
-                if (!$('#expiryDate').val()) {
-                    isValid = false;
-                    $('#expiryDateError').text('Expiry Date is required ');
-                } else if ($('#expiryDate').val() == today) {
-                    isValid = false;
-                    $('#expiryDateError').text('Expiry Date is required ');
-                } else {
-                    $('#expiryDateError').text('');
-                }
+                    // Validate Offer expiryDate
+                    let today = new Date().date
+                    console.log(today)
+                    if (!$('#expiryDate').val()) {
+                        isValid = false;
+                        $('#expiryDateError').text('Expiry Date is required ');
+                    } else if ($('#expiryDate').val() == today) {
+                        isValid = false;
+                        $('#expiryDateError').text('Expiry Date is required ');
+                    } else {
+                        $('#expiryDateError').text('');
+                    }
 
 
-                // Validate minpurchaseamount
-                if (!$('#minpurchaseamount').val()) {
-                    isValid = false;
-                    $('#minpurchaseamountError').text('minpurchaseamount is required.');
-                } else {
-                    $('#minpurchaseamountError').text('');
-                }
+                    // Validate minpurchaseamount
+                    if (!$('#minpurchaseamount').val()) {
+                        isValid = false;
+                        $('#minpurchaseamountError').text('minpurchaseamount is required.');
+                    } else {
+                        $('#minpurchaseamountError').text('');
+                    }
 
 
 

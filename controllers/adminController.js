@@ -457,11 +457,15 @@ const editingCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const category = req.params.category
+         
 
         const status = await Category.findOne({ _id: category });
         if (status.status) {
             const changing = await Category.findOneAndUpdate({ _id: category }, { $set: { status: false } }, { new: true })
+            // await Product.updateMany({category:category},{$set:{is_blocked:0}})
             res.json({ changing })
+
+            
 
 
         } else {

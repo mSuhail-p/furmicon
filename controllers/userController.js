@@ -994,12 +994,12 @@ let cancelOrder = async (req, res) => {
             await Wallet.updateOne(
                 { userId: user_id },
                 {
-                    $inc: { balance: product.offerPrice },
+                    $inc: { balance: product.offerPrice+50 },
                     $push: {
                         history: {
                             Date: new Date().toDateString(),
                             Description: `${product.name} cancelled`,
-                            Amount: `+ ${product.offerPrice}`,
+                            Amount: `+ ${product.offerPrice+50}`,
                             time: new Date()
                         }
                     }

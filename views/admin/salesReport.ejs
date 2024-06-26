@@ -32,7 +32,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="/admin/assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" />
+                <span style="color: #c96; font-size:x-large;">FurniFusion</span>
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"><i
@@ -243,10 +243,10 @@
                                 <tr class="text-center">
                                     <!-- <th>Image</th> -->
                                     <th>No</th>
+                                    <th scope="col">Id</th>
+                                    <th scope="col">Client Name</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Sales Count</th>
-                                    <!-- <th scope="col">Quantity</th> -->
-                                    <th scope="col">Revenue</th>
+                                     <th scope="col">Revenue</th>
                                     <!-- <th scope="col">Status</th>
                                     <th scope="col">More</th> -->
 
@@ -272,13 +272,13 @@
                                                     <%=report._id%>
                                                 </b></td>
                                             <td>
-                                                <%=report.totalCount%>
+                                                <%=report.userName%>
                                             </td>
                                             <td>
-                                                ₹<%=report.totalRevenue%>
+                                                <%=report.purchasedDate%>
                                             </td>
 
-                                            <!-- <td>03.12.2020</td> -->
+                                            <td><%=report.subTotal%></td>
 
 
                                 </tr>

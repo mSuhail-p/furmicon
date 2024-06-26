@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Offer</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .modal-error {
+            color: red;
+            font-size: 0.875em;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Add Coupon</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container w-50 mt-5">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title">Edit Coupon</h5>
+                </div>
+                <div class="card-body">
+                    <% if (existCoupen){%>
+                        <form id="couponForm" novalidate>
+                            <div class="mb-3">
+                                <label for="couponName" class="form-label">Coupon Name</label>
+                                <input type="text" name="couponName" value="<%=existCoupen.coupenName%>"
+                                    class="form-control" id="couponName" required>
+                                <div class="modal-error" id="couponNameError"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="couponCode" class="form-label">Coupon Code</label>
+                                <input type="text" name="couponCode" value="<%=existCoupen.coupenCode%>"
+                                    class="form-control" id="couponCode" required>
+                                <div class="modal-error" id="couponCodeError"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="discount" class="form-label">Discount (in percentage)</label>
+                                <input type="number" name="discount" value="<%=existCoupen.discountPercentage%>"
+                                    class="form-control" id="discount" required>
+                                <div class="modal-error" id="discountError"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date</label>
+                                <input type="date" name="expiryDate"
+                                    value="<%=existCoupen.expiryDate.toISOString().split('T')[0] %>"
+                                    class="form-control" id="expiryDate" required>
+                                <div class="modal-error" id="expiryDateError"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="minPurchaseAmount" class="form-label">Min Purchase Amount</label>
+                                <input type="number" value="<%=existCoupen.cryteriaAmount%>" name="minPurchaseAmount"
+                                    class="form-control" id="minPurchaseAmount" required>
+                                <div class="modal-error" id="minPurchaseAmountError"></div>
+                            </div>
+                            <input type="hidden" name="coupenId" value="<%=existCoupen._id%>">
+                            <button type="submit" id="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                        <% } %>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                $('#couponForm').on('submit', function (event) {
+                    event.preventDefault();
+                    let isValid = true;
+
+                    // Validate coupon Name
+                    if (!$('#couponName').val().trim()) {
+                        isValid = false;
+                        $('#couponNameError').text('Coupon name is required.');
+                    } else {
+                        $('#couponNameError').text('');
+                    }
+
+                    // Validate coupon code
+                    if (!$('#couponCode').val().trim()) {
+                        isValid = false;
+                        $('#couponCodeError').text('Coupon code is required.');
+                    } else {
+                        $('#couponCodeError').text('');
+                    }
+
+                    // Validate discount
+                    let percentage = $('#discount').val();
+                    if (percentage > 100) {
+                        isValid = false;
+                        $('#discountError').text('Discount must be under 100%.');
+                    } else if (!percentage.trim()) {
+                        isValid = false;
+                        $('#discountError').text('Discount is required.');
+                    } else if (percentage < 0) {
+                        isValid = false;
+                        $('#discountError').text('Discount must be above 0%.');
+                    } else {
+                        $('#discountError').text('');
+                    }
+
+                    // Validate expiry date
+                    let today = new Date().toISOString().split('T')[0];
+                    if (!$('#expiryDate').val()) {
+                        isValid = false;
+                        $('#expiryDateError').text('Expiry date is required.');
+                    } else if ($('#expiryDate').val() <= today) {
+                        isValid = false;
+                        $('#expiryDateError').text('Expiry date must be in the future.');
+                    } else {
+                        $('#expiryDateError').text('');
+                    }
+
+                    // Validate min purchase amount
+                    if (!$('#minPurchaseAmount').val()) {
+                        isValid = false;
+                        $('#minPurchaseAmountError').text('Minimum purchase amount is required.');
+                    } else {
+                        $('#minPurchaseAmountError').text('');
+                    }
+
+                    if (isValid) {
+                        document.getElementById('submit').addEventListener('click', function () {
+                            // Submit the form or perform any other desired action
+                            const form = document.getElementById('couponForm')
+                            const formData = new FormData(form);
+                            console.log(formData)
+                            let coupenDataObj = {}
+                            for (let [key, value] of formData.entries()) {
+                                console.log(key, value)
+                                coupenDataObj[key] = value
+                            }
+                            axios.post('/admin/editCoupen', coupenDataObj)
+                                .then(Response => {
+                                    if (Response.data.coupenUpdate) {
+                                        window.location.href = '/admin/getCoupen'
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log(error)
+                                })
+                        })
+                    }
+                });
+            });
+        </script>
+    </body>
+
+    </html>
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+
+</html>

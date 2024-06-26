@@ -332,7 +332,7 @@ const verifyPayment = async (req, res) => {
         // Compare the signatures
         if (generated_signature === razorpay_signature) {
             if (req.body.orderId) {
-                 
+
                 let updateRetry = await Order.updateOne({
                     _id: req.body.orderId,
                     'orderedProducts._id': req.body.productId
@@ -347,10 +347,15 @@ const verifyPayment = async (req, res) => {
 
                     }
                 })
-                
-                res.json({retry:true})
 
- 
+                 
+                //Aftet placing order , delete cart document
+                await Cart.deleteOne({ userId:req.session.user_id})
+                console.log('quanitry decreased')
+
+                res.json({ retry: true })
+
+
             } else {
 
 

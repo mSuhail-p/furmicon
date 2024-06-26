@@ -58,14 +58,59 @@ const accessCoupen = async (req, res) => {
 
 let deleteCoupen = async (req, res) => {
     try {
-        let {coupenId} = req.params
-        
-        let deleteCoupen = await Coupen.deleteOne({_id:coupenId})
-        res.json({deleteCoupen:true})
+        let { coupenId } = req.params
+
+        let deleteCoupen = await Coupen.deleteOne({ _id: coupenId })
+        res.json({ deleteCoupen: true })
 
 
     } catch (error) {
         console.log("error rendering deleteCoupen  :", error)
+    }
+}
+
+let getEditCoupen = async (req, res) => {
+
+    try {
+
+        const {coupenId} = req.query
+        let existCoupen = await Coupen.findOne({_id:coupenId})
+        console.log(existCoupen)
+        res.render('admin/editCoupen',{existCoupen})
+
+
+
+    } catch (error) {
+        console.log('error rendering get edit coupen:', error)
+    }
+}
+
+
+let editCoupen = async (req, res) => {
+
+    try {
+        console.log('it is edit coupen')
+        console.log(req.body)
+        const { coupenName, couponCode, discount, expiryDate,  minPurchaseAmount ,coupenId } = req.body
+
+        console.log( coupenName, couponCode, discount, expiryDate,  minPurchaseAmount ,coupenId)
+
+
+        let updateCoupen = await Coupen.updateOne({_id:coupenId},{$set:{
+            coupenName:coupenName,
+            coupenCode:couponCode,
+            discountPercentage:discount,
+            expiryDate:expiryDate,
+            cryteriaAmount:minPurchaseAmount
+        }}) 
+
+        console.log(updateCoupen)
+        res.json({coupenUpdate:true})
+        
+
+
+    } catch (error) {
+        console.log('error rendering edit coupen:', error)
     }
 }
 
@@ -76,5 +121,7 @@ module.exports = {
     getCoupen,
     addCoupen,
     accessCoupen,
-    deleteCoupen
+    deleteCoupen,
+    getEditCoupen,
+    editCoupen
 }

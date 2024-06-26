@@ -322,7 +322,7 @@
 
                                             <tr class="summary-total">
                                                 <td>Total:</td>
-                                                <td id="summaryTotal">₹ <%=totalPrice +50%>
+                                                <td id="summaryTotal">₹ <%=totalPrice!=0?totalPrice+50:0%>
                                                 </td>
                                             </tr><!-- End .summary-total -->
                                         </tbody>
@@ -561,7 +561,7 @@
                         let data = response.data.cartDocument
                         let subTotal = data.Products.reduce((acc, cur) => acc + cur.quantity * cur.productId.offerPrice, 0)
                         document.getElementById('subTotal').innerHTML = subTotal
-                        document.getElementById('summaryTotal').innerHTML = subTotal + 20
+                        document.getElementById('summaryTotal').innerHTML = subTotal + 50
 
                     })
                     .catch(error => {
@@ -582,11 +582,14 @@
     <script>
 
         function removeCart(productId, index) {
+            
 
 
             axios.patch(`/removeCart/${productId}`)
                 .then(response => {
                     let cartProduct = document.getElementById(`oneproduct-${index}`).remove()
+                    // document.getElementById(subTotal).innerHTML = parseInt(document.getElementById(subTotal).innerHTM)
+                    window.location.reload()
 
 
                 })
