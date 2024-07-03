@@ -12,7 +12,7 @@ const getOrder = async (req, res) => {
             path: 'orderedProducts.productId',
             model: 'Product'
         }).sort({ orderedTime: -1 })
-        console.log(Orderdoc[0].orderedProducts[0].productId.price)
+        
 
         res.render('admin/order', { Orderdoc })
 
