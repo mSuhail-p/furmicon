@@ -70,6 +70,7 @@ const loadproduct = async (req, res) => {
 
         const liproduct = await Product.find({}).sort({ date: -1 }).populate('category').populate('offer')
         // console.log(liproduct[0].offer.offerName,'it is offer name')
+        console.log(liproduct.images,'it is images')
 
         if (liproduct) {
             // console.log(liproduct[0].category + "categoryyyyyyyyyyyyyyyyyy")
