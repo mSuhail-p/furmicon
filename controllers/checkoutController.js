@@ -331,7 +331,7 @@ const verifyPayment = async (req, res) => {
 
         // Compare the signatures
         if (generated_signature === razorpay_signature) {
-            if (req.body.orderId) {
+            if (req.body.orderId) {  //for retry
 
                 let updateRetry = await Order.updateOne({
                     _id: req.body.orderId,

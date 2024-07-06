@@ -269,7 +269,7 @@ const verifiedLogin = async (req, res) => {
 
 const loadHome = async (req, res) => {
     try {
-        const product = await Product.find({ $and: [{ quantity: { $gt: 0 } }, { is_blocked: 1 }] }).sort({ date: -1 }).limit(12).populate('category')
+        const product = await Product.find({ $and: [{ quantity: { $gt: 0 } }, { is_blocked: 1 }] }).sort({ date: -1 }).limit(8).populate('category')
         const category = await Category.find({})
 
         if (req.session.user_id) {
