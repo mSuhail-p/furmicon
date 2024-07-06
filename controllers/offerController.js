@@ -75,7 +75,7 @@ const editOffer = async (req, res) => {
 
       let {offerID} = req.query
        let selected= await Offer.findOne({_id:offerID})
-       res.render('admin/editOffer',{selected})
+       res.render('admin/editoffer',{selected})
         
 
     } catch (error) {
