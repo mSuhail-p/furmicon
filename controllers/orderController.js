@@ -164,7 +164,7 @@ let sortReport = async (req, res) => {
         console.log(sort, 'it is searchdate')
         if (sort == 'Day') {
             console.log('it is inside the day ')
-            let today = new Date()
+            let today = new Date().toDateString()
             // console.log(today)
 
             // let report = await Order.aggregate([
@@ -182,7 +182,7 @@ let sortReport = async (req, res) => {
             //     }
             // ]);
             // console.log(report, 'it is dayaaaaaa')
-            let report = await Order.find({ orderedTime: { $gte: today } })
+            let report = await Order.find({ purchasedDate: { $gte: today } })
 
             res.render('admin/salesReport', { report })
         } else if (sort == 'Month') {
