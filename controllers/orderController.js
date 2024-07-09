@@ -8,13 +8,22 @@ const Product = require('../model/product')
 const getOrder = async (req, res) => {
     try {
 
-        let Orderdoc = await Order.find({}).populate({
+        let orders = await Order.find({}).populate({
             path: 'orderedProducts.productId',
             model: 'Product'
         }).sort({ orderedTime: -1 })
-        
 
-        res.render('admin/order', { Orderdoc })
+
+        let page = req.query.page || 1
+        let limit = 10
+        let start = (page - 1) * limit
+        let end = page * limit
+        let Orderdoc = orders.slice(start, end)
+        let length = orders.length
+        console.log(length,'it is length ')
+
+
+        res.render('admin/order', { Orderdoc,length })
 
 
 

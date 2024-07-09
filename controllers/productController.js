@@ -166,9 +166,10 @@ const edit_product = async (req, res) => {
             price,
             quantity,
             images,
-            description
+            description,
+            offerPrice:price
         }, { new: true });
-
+         
         res.redirect('/admin/product')
     } catch (error) {
         console.error('Error updating product:', error);

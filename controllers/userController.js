@@ -501,6 +501,7 @@ const shopProduct = async (req, res) => {
 
         const products = filterdProducts.slice(startIndex, endIndex);
         const length = filterdProducts.length
+        console.log(length ,'it is length')
 
 
 

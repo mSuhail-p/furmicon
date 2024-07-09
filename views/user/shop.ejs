@@ -295,7 +295,7 @@
                                                                         <a href="/details/<%= elements._id %>">
                                                                             <!-- <a href="/details/<%= elements.images %>"></a> -->
                                                                             <img style="height: 240px;"
-                                                                                src="/userImages/<%= elements.images[0] %>"
+                                                                                src="/userImages/<%=elements.images[0] %>"
                                                                                 alt="Product image"
                                                                                 class="product-image">
                                                                         </a>
@@ -388,7 +388,7 @@
                                                     <% if(typeof length !='undefined' ){ %>
 
 
-                                                        <% for(let i=1;i<length/4;i++){ %>
+                                                        <% for(let i=1;i<length/6;i++){ %>
 
                                                             <li class="page-item active" aria-current="page"><a
                                                                     class="page-link" href="/shop?page=<%=i%>">
