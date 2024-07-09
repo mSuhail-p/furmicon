@@ -3,6 +3,7 @@ const Category = require('../model/category')
 const Offer = require('../model/OfferModel')
 const mongoose = require('mongoose');
 const fs = require('fs');
+let page;
 // const { product } = require('./adminController');
 // const { product } = require('./adminController');
 
@@ -68,14 +69,31 @@ const addProduct = async (req, res) => {
 const loadproduct = async (req, res) => {
     try {
 
-        const liproduct = await Product.find({}).sort({ date: -1 }).populate('category').populate('offer')
-        // console.log(liproduct[0].offer.offerName,'it is offer name')
-        console.log(liproduct[0].images,'it is images')
+        const allProducts = await Product.find({}).sort({ date: -1 }).populate('category').populate('offer')
 
-        if (liproduct) {
+
+        if (allProducts) {
+            // page = parseInt(req.query.page, 10) || 1; // Ensuring page is an integer
+
+            if (req.query.page == 'plus') {
+                page = parseInt(page + 1)
+            } else if (req.query.page == 'minus') {
+                page = parseInt(page - 1)
+            } else {
+                page = parseInt(req.query.page) || 1
+            }
+            let limit = 7;
+            let start = (page - 1) * limit;
+            let end = page * limit;
+
+            let liproduct = allProducts.slice(start, end);
+            console.log(liproduct, 'it is list product');
+
+            let length = allProducts.length;
+
             // console.log(liproduct[0].category + "categoryyyyyyyyyyyyyyyyyy")
 
-            res.render('admin/product_list', { liproduct });
+            res.render('admin/product_list', { liproduct, length });
 
         } else {
             res.status(500).json({ error: 'Internal Server Error' });
@@ -167,9 +185,9 @@ const edit_product = async (req, res) => {
             quantity,
             images,
             description,
-            offerPrice:price
+            offerPrice: price
         }, { new: true });
-         
+
         res.redirect('/admin/product')
     } catch (error) {
         console.error('Error updating product:', error);
@@ -218,7 +236,7 @@ const removeOffer = async (req, res) => {
 
         } else {
             let selected = await Category.findOneAndUpdate(
-                { _id: id },                
+                { _id: id },
                 { $unset: { offer: "" } }
             )
         }
