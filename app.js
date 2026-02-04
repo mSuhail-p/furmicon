@@ -1,11 +1,11 @@
 
+require('dotenv').config();
 const express = require('express');
-const flash = require('express-flash')
+const flash = require('express-flash')  
 const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session')
 const nocache = require('nocache')
-require('dotenv').config();
 
 const adminRouter = require('./routes/admin');
 const usersRouter = require('./routes/users');
@@ -29,8 +29,8 @@ app.set('view engine', 'ejs')
 const PORT = process.env.PORT || 3000;
 
 //connecting database
-mongoose.connect(process.env.MONGODB_CONNECT)
-// mongoose.connect('mongodb://127.0.0.1:27017/first_project')
+// mongoose.connect(process.env.MONGODB_CONNECT)
+mongoose.connect('mongodb://127.0.0.1:27017/first_project')
 
 
 

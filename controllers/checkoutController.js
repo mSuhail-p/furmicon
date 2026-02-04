@@ -75,7 +75,7 @@ let placeOrder = async (req, res) => {
 
         }))
 
-        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0) + 50
+        let subTotal = userCart.Products.reduce((total, current) => total + current.productId.offerPrice * current.quantity, 0)+1
         if (coupenId != undefined) {
 
             let selectedCoupon = await Coupen.findOneAndUpdate(

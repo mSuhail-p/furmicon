@@ -20,10 +20,10 @@ const getOrder = async (req, res) => {
         let end = page * limit
         let Orderdoc = orders.slice(start, end)
         let length = orders.length
-        console.log(length,'it is length ')
+        console.log(length, 'it is length ')
 
 
-        res.render('admin/order', { Orderdoc,length })
+        res.render('admin/order', { Orderdoc, length })
 
 
 
@@ -129,12 +129,12 @@ let getInvoice = async (req, res) => {
 
 let searchWithDate = async (req, res) => {
     try {
-
+        console.log('here is reache')
         let { searcheDate } = req.body
 
         let searchedDate = new Date(searcheDate)
 
-
+        console.log(searchedDate, 'it is searched data')
 
         // let report = await Order.aggregate([
 
@@ -154,8 +154,11 @@ let searchWithDate = async (req, res) => {
 
         //     { $sort: { purchasedDateAsDate: -1 } }
         // ]);
-        let report = await Order.find({ orderedTime: { $gt: searchedDate } }).sort({ orderedTime: -1 })
-
+        let report = await Order.find({ orderedTime: { $eq: searchedDate } }).sort({ orderedTime: -1 })
+        // let report = await Order.find({
+        //     orderedTime: { $gte: startOfDay, $lt: endOfDay }
+        // }).sort({ orderedTime: -1 });
+        console.log(report, 'it is report')
 
         res.render('admin/salesReport', { report })
 
