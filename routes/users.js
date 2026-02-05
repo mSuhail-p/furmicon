@@ -21,17 +21,17 @@ const orderContrller = require('../controllers/orderController')
 router.get('/', auth.isAuthenticated, userController.loadHome)
 
 //Auth google 
-router.get('/auth/google', passport.authenticate('google', {
-    scope:
-        ['email', 'profile']
-}))
+// router.get('/auth/google', passport.authenticate('google', {
+//     scope:
+//         ['email', 'profile']
+// }))
 
 //Auth Callback
-router.get('/auth/google/callback',
-    passport.authenticate('google', {
-        successRedirect: '/success'
-    })
-)
+// router.get('/auth/google/callback',
+//     passport.authenticate('google', {
+//         successRedirect: '/success'
+//     })
+// )
 //google auth 
 
 router.get('/success', userController.googleAuth)
@@ -72,7 +72,7 @@ router.get('/getCheckout', auth.cart, checkoutController.getCheckout)
 router.post('/placeOrder', auth.cart, checkoutController.placeOrder)
 router.get('/orderPlaced/:orderId', auth.cart, checkoutController.orderPlaced)
 router.post('/verifyPayment', auth.cart, checkoutController.verifyPayment)
-router.post('/failedPayment',auth.cart,checkoutController.failedPayment)
+router.post('/failedPayment', auth.cart, checkoutController.failedPayment)
 
 
 //Coupen
