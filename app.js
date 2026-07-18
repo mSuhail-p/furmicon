@@ -30,6 +30,7 @@ const PORT = process.env.PORT || 3000;
 
 //connecting database
 mongoose.connect(process.env.MONGODB_CONNECT)
+// mongoose.connect("mongodb://localhost:27017/first_project")
 
 
 

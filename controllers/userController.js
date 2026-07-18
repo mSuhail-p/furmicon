@@ -103,8 +103,8 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
             secure: false,
             requireTLS: true,
             auth: {
-                user: 'msuhailkzp@gmail.com',
-                pass: 'brbf ufbu mhxr nwuo'
+                user: process.env.EMAIL_NODEMAILER,
+                pass: process.env.GOOGLE_APP_PASSWORD
 
             }
 
@@ -113,7 +113,7 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
 
 
         const mailOption = {
-            from: 'msuhailkzp@gmail.com',
+            from: process.env.EMAIL_NODEMAILER,
             to: email,
             subject: 'For verfication mail ',
 
@@ -502,7 +502,7 @@ const shopProduct = async (req, res) => {
 
         const products = filterdProducts.slice(startIndex, endIndex);
         const length = filterdProducts.length
-        console.log(length ,'it is length')
+        console.log(length, 'it is length')
 
 
 
@@ -680,7 +680,7 @@ const googleAuth = async (req, res) => {
             res.redirect('/')
 
         } else {
-          
+
 
             const googleRegister = new User({
                 username: req.user.name.givenName,
@@ -689,7 +689,7 @@ const googleAuth = async (req, res) => {
                 is_verified: 1
             })
 
- 
+
             let googledoc = await googleRegister.save()
 
             //create wallet
@@ -996,12 +996,12 @@ let cancelOrder = async (req, res) => {
             await Wallet.updateOne(
                 { userId: user_id },
                 {
-                    $inc: { balance: product.offerPrice+50 },
+                    $inc: { balance: product.offerPrice + 50 },
                     $push: {
                         history: {
                             Date: new Date().toDateString(),
                             Description: `${product.name} cancelled`,
-                            Amount: `+ ${product.offerPrice+50}`,
+                            Amount: `+ ${product.offerPrice + 50}`,
                             time: new Date()
                         }
                     }
