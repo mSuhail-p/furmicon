@@ -98,10 +98,13 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
     try {
 
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            requireTLS: true,
+            // host: 'smtp.gmail.com',
+            // port: 587,
+            // secure: false,
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
+            // requireTLS: true,
             auth: {
                 user: process.env.EMAIL_NODEMAILER,
                 pass: process.env.GOOGLE_APP_PASSWORD
@@ -110,13 +113,8 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
 
         })
 
-        try {
-            await transporter.verify();
-            console.log("SMTP Verified");
-        } catch (err) {
-            console.error(err, ": error occred in transport.verify");
-        }
-
+        console.log(process.env.EMAIL_NODEMAILER);
+        console.log(process.env.GOOGLE_APP_PASSWORD ? "Password exists" : "No password");
 
 
         const mailOption = {
