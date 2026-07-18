@@ -110,6 +110,13 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
 
         })
 
+        try {
+            await transporter.verify();
+            console.log("SMTP Verified");
+        } catch (err) {
+            console.error(err, ": error occred in transport.verify");
+        }
+
 
 
         const mailOption = {
