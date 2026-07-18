@@ -117,7 +117,7 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
             to: email,
             subject: 'For verfication mail ',
 
-            // html:'<p>Hii '+name+', please check here to <a href="http://127.0.0.1:3000/verify?id='+user_id+'">Verify</a> your mail.</p>'
+            // html:'<p>Hii '+name+', please check here to <a href="http://127.0.0.1:3000/verify?id='+user_id+'">Verify</a> your mail.</p>' 
             html: '<p>Hii ' + name + ' Otp =' + otpgener + '</p>'
 
 

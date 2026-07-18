@@ -29,10 +29,7 @@ app.set('view engine', 'ejs')
 const PORT = process.env.PORT || 3000;
 
 //connecting database
-// mongoose.connect(process.env.MONGODB_CONNECT)
-mongoose.connect('mongodb://127.0.0.1:27017/first_project')
-// mongoose.connect('mongodb+srv://suhailkzp1:heKmOkgh7JKGLuXc@cluster0.7efg90n.mongodb.net/?appName=Cluster0')
-// mongoose.connect('mongodb+srv://suhailkzp1:o8mra4xkB43PASJ6@cluster0.7efg90n.mongodb.net/?appName=Cluster0')
+mongoose.connect(process.env.MONGODB_CONNECT)
 
 
 
