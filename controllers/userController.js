@@ -104,7 +104,7 @@ const sendVerifyMail = async (name, email, user_id, otpgener) => {
             requireTLS: true,
             auth: {
                 user: 'msuhailkzp@gmail.com',
-                pass: 'uzea zvtv bjkd awty'
+                pass: 'brbf ufbu mhxr nwuo'
 
             }
 
@@ -171,6 +171,7 @@ const insertUser = async (req, res) => {
                 mobile: req.body.mobile,
                 password: spassword,
                 is_admin: 0,
+
 
 
             })
