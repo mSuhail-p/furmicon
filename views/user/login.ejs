@@ -4,167 +4,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Furmicon | Account Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
         body {
-            /* background: linear-gradient(135deg, #71b7e6, #9b59b6); */
-            background-image: url(/assets/images/backgrounds/old.jpg);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85)), url(/assets/images/backgrounds/old.jpg);
             background-size: cover;
-            height: 100vh;
+            background-position: center;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
+            padding: 20px;
         }
 
         .login-container {
-            max-width: 400px;
+            max-width: 440px;
             width: 100%;
-            /* background-color:#dac3b3; */
-            margin-left: -2px;
-            padding: 30px;
-            border-radius: 10px;
-            /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
-            /* From https://css.glass */
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        .form-group i {
+        .brand-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand-header h2 {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .brand-header p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-icon {
             position: absolute;
             top: 50%;
-            left: 10px;
+            left: 15px;
             transform: translateY(-50%);
-            color: #aaa;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+            z-index: 5;
         }
 
-        .form-group input {
-            padding-left: 30px;
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            cursor: pointer;
+            z-index: 5;
         }
 
-        
+        .form-control {
+            height: 48px;
+            padding-left: 45px;
+            padding-right: 45px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .form-control:focus + .input-icon {
+            color: #3b82f6;
+        }
+
+        .btn-submit {
+            height: 48px;
+            border-radius: 10px;
+            background: #2563eb;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #94a3b8;
+            margin: 20px 0;
+            font-size: 0.85rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .divider::before {
+            margin-right: .5em;
+        }
+
+        .divider::after {
+            margin-left: .5em;
+        }
+
+        .btn-google {
+            height: 44px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+        }
+
+        .btn-google:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .text-danger {
+            color: #ef4444 !important;
+        }
+
+        .error-feedback {
+            font-size: 0.8rem;
+            color: #ef4444;
+            margin-top: 4px;
+            display: block;
+        }
     </style>
 </head>
 
 <body>
     <div class="login-container">
-        <h2 class="text-center mb-4">Login</h2>
+        <div class="brand-header">
+            <h2>Furmicon</h2>
+            <p>Welcome back! Please login to your account</p>
+        </div>
+
         <form action="/login" method="post" id="loginForm">
-            <div class="form-group position-relative">
-                <i class="fas fa-envelope"></i>
-                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email">
-            </div>
-            <div class="form-group position-relative">
-                <i class="fas fa-lock"></i>
-                <input type="password" class="form-control eye-icon" id="password" name="password"
-                    placeholder="Enter your password">
-
+            <div class="form-group mb-3">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Email Address">
             </div>
 
-
-
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-
-            <div class="text-right">
-                <a href="/signUp" class="text-danger">Sign up</a>
-                <!-- <a href="#" class="text-danger ml-2">Forget Password?</a> -->
+            <div class="form-group mb-3">
+                <i class="fas fa-lock input-icon"></i>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
             </div>
-            <div class="my-3 text-center">
-                <small class="text-white">Or Login with</small>
-            </div>
-            <div class="d-flex justify-content-center">
-                <a href="/auth/google" class="btn btn-danger mx-2"><i class="fab fa-google"></i> Google</a>
-                <!-- <a href="#" class="btn btn-primary mx-2"><i class="fab fa-facebook-f"></i> Facebook</a> -->
-            </div>
-            <% if(typeof afterOtp !='undefined' ) { %>
 
-                <p class="text-success  text-center font-weight-bold fs-3 ">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div></div>
+                <a href="/signUp" class="text-primary font-weight-bold" style="font-size: 0.88rem;">Need an account? Sign up</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-submit">Sign In</button>
+
+            <div class="divider">Or login with</div>
+
+            <a href="/auth/google" class="btn-google">
+                <i class="fab fa-google text-danger"></i> Google Account
+            </a>
+
+            <% if(typeof afterOtp != 'undefined' && afterOtp) { %>
+                <div class="alert alert-success text-center mt-3 py-2 style="font-size: 0.9rem;">
                     <%= afterOtp %>
-                </p>
+                </div>
+            <% } %>
 
-                <% } %>
-                    <% if (typeof emailverification !='undefined' ){ %>
+            <% if (typeof emailverification != 'undefined' && emailverification) { %>
+                <script>
+                    Swal.fire({
+                        icon: "error",
+                        title: "Account Verification Error",
+                        text: "<%= emailverification %>",
+                        confirmButtonColor: "#2563eb"
+                    });
+                </script>
+            <% } %>
 
-                        <script>
-                            // Function to show the SweetAlert
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: "<%=emailverification %>",
+            <% if (typeof blockedUser != 'undefined' && blockedUser) { %>
+                <script>
+                    Swal.fire({
+                        icon: "error",
+                        title: "Account Blocked",
+                        text: "<%= blockedUser %>",
+                        confirmButtonColor: "#2563eb"
+                    });
+                </script>
+            <% } %>
 
-                            });
-                        </script>
+            <% if (typeof is_verified != 'undefined' && is_verified) { %>
+                <script>
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Verification Required",
+                        text: "<%= is_verified %>",
+                        confirmButtonColor: "#2563eb"
+                    });
+                </script>
+            <% } %>
 
-
-
-                        <% } %>
-
-                            <% if (typeof blockedUser !='undefined' ){ %>
-
-                                <script>
-                                    // Function to show the SweetAlert
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Oops...",
-                                        text: "<%=blockedUser %>",
-
-                                    });
-                                </script>
-                                <% } %>
-
-
-                                    <% if (typeof is_verified!='undefined' ){ %>
-
-                                        <script>
-                                            // Function to show the SweetAlert
-                                            Swal.fire({
-                                                icon: "error",
-                                                title: "Oops...",
-                                                text: "<%= is_verified %>",
-
-                                            });
-                                        </script>
-
-
-
-                                        <% } %>
-
-
-                                            <% if (typeof invalid !='undefined' ){ %>
-
-                                                <script>
-                                                    // Function to show the SweetAlert
-                                                    Swal.fire({
-                                                        icon: "error",
-                                                        title: "Oops...",
-                                                        text: "<%=invalid %>",
-
-                                                    });
-                                                </script>
-
-
-
-                                                <% } %>
-
-
-
+            <% if (typeof invalid != 'undefined' && invalid) { %>
+                <script>
+                    Swal.fire({
+                        icon: "error",
+                        title: "Login Failed",
+                        text: "<%= invalid %>",
+                        confirmButtonColor: "#2563eb"
+                    });
+                </script>
+            <% } %>
         </form>
     </div>
-
-    <!-- <div style="display: flex;">
-
-        <div id="details" class="info-section">
-            <h1>Furmicone</h1>
-            <p>Quality is never compromised</p>
-        </div>
-    </div> -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -173,10 +261,20 @@
         const form = document.getElementById('loginForm');
         const email = document.getElementById('email');
         const password = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+
+        togglePassword.addEventListener('click', function () {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            validateForm();
+            if (validateForm()) {
+                form.submit();
+            }
         });
 
         function validateForm() {
@@ -186,7 +284,7 @@
                 showError(email, 'Email is required');
                 isValid = false;
             } else if (!isValidEmail(email.value.trim())) {
-                showError(email, 'Invalid email address');
+                showError(email, 'Please enter a valid email address');
                 isValid = false;
             } else {
                 removeError(email);
@@ -196,45 +294,39 @@
                 showError(password, 'Password is required');
                 isValid = false;
             } else if (password.value.trim().length < 8) {
-                showError(password, 'Password must be at least 8 characters long');
+                showError(password, 'Password must be at least 8 characters');
                 isValid = false;
             } else {
                 removeError(password);
             }
 
-            if (isValid) {
-                // Form is valid, you can submit the form or perform other actions
-
-                form.submit()
-            }
+            return isValid;
         }
 
         function showError(input, message) {
             const formGroup = input.parentElement;
-            formGroup.classList.add('has-danger');
-            const errorMessage = formGroup.querySelector('small');
+            let errorMessage = formGroup.querySelector('.error-feedback');
             if (!errorMessage) {
-                const small = document.createElement('small');
-                small.textContent = message;
-                small.classList.add('form-text', 'text-danger');
-                formGroup.appendChild(small);
-            } else {
-                errorMessage.textContent = message;
+                errorMessage = document.createElement('span');
+                errorMessage.classList.add('error-feedback');
+                formGroup.appendChild(errorMessage);
             }
+            errorMessage.textContent = message;
+            input.classList.add('is-invalid');
         }
 
         function removeError(input) {
             const formGroup = input.parentElement;
-            formGroup.classList.remove('has-danger');
-            const errorMessage = formGroup.querySelector('small');
+            const errorMessage = formGroup.querySelector('.error-feedback');
             if (errorMessage) {
                 errorMessage.remove();
             }
+            input.classList.remove('is-invalid');
         }
 
-        function isValidEmail(email) {
+        function isValidEmail(emailStr) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
+            return emailRegex.test(emailStr);
         }
     </script>
 </body>

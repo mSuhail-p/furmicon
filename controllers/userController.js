@@ -7,6 +7,7 @@ const Category = require('../model/category')
 const userAddress = require('../model/Address')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const Wallet = require('../model/walletModel')
 const Return = require('../model/returnModel')
 
@@ -27,193 +28,164 @@ const securePassword = async (password) => {
 
 
 
-//send mail
-//  Function to Generator Otp :- ,
-
-const generateOTP = (req, res) => {
+// Function to Generate Cryptographically Secure 4-Digit OTP
+const generateOTP = () => {
     try {
-        const digits = '0123456789';
-        let OTP = '';
-        for (let i = 0; i < 4; i++) {
-            OTP += digits[Math.floor(Math.random() * 10)];
-
-        }
-
-
-        return OTP;
-
-
+        return crypto.randomInt(1000, 10000).toString();
     } catch (error) {
-        console.log(error)
+        console.error("Error generating OTP:", error);
+        // Fallback if randomInt fails
+        return Math.floor(1000 + Math.random() * 9000).toString();
     }
-
 }
 
 const saveOtp = async (email, Otp) => {
     try {
-        console.log("it is save otp " + email, Otp)
+        const normalizedEmail = email.toLowerCase().trim();
+        // Remove any existing OTP for this email first
+        await OTP.deleteMany({ email: normalizedEmail });
+        
         const otp = new OTP({
-            email: email,
+            email: normalizedEmail,
             otp: Otp
-
-        })
+        });
 
         const newOtp = await otp.save();
-        console.log("new otp generated" + newOtp)
-        // verifyMail(newOtp.otp)
+        console.log("New OTP generated and saved for:", normalizedEmail);
         return newOtp;
-
-
-
     } catch (error) {
-        console.log(error)
+        console.error("Error in saveOtp:", error);
+        throw error;
     }
 }
 
 
 const resendOtp = async (req, res) => {
     try {
+        const email = req.session.email;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Session expired. Please register again.' });
+        }
 
-        await OTP.deleteOne({ email: req.session.email })
-        console.log("it is befor new otp")
+        const normalizedEmail = email.toLowerCase().trim();
+        await OTP.deleteMany({ email: normalizedEmail });
+
         const newOtp = generateOTP();
-        saveOtp(req.session.email, newOtp)
-        const userdetails = await User.findOne({ email: req.session.email })
-        // console.log(userdetails.usernamefsdfname)
+        await saveOtp(normalizedEmail, newOtp);
 
-        sendVerifyMail(userdetails.username, userdetails.email, userdetails._id, newOtp)
+        const userdetails = await User.findOne({ email: normalizedEmail });
+        if (!userdetails) {
+            return res.status(404).json({ success: false, message: 'User details not found.' });
+        }
 
+        const emailSent = await sendVerifyMail(userdetails.username, userdetails.email, userdetails._id, newOtp);
 
-
-
-
-
+        if (emailSent) {
+            return res.status(200).json({ success: true, message: 'OTP has been resent to your email.' });
+        } else {
+            return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again.' });
+        }
     } catch (error) {
-        console.log(error)
+        console.error("Error in resendOtp:", error);
+        return res.status(500).json({ success: false, message: 'Server error while resending OTP.' });
     }
 }
 
 
 const sendVerifyMail = async (name, email, user_id, otpgener) => {
     try {
+        if (!process.env.EMAIL_NODEMAILER || !process.env.GOOGLE_APP_PASSWORD) {
+            console.error("EMAIL_NODEMAILER or GOOGLE_APP_PASSWORD not set in environment variables.");
+            return false;
+        }
 
         const transporter = nodemailer.createTransport({
-            // host: 'smtp.gmail.com',
-            // port: 587,
-            // secure: false,
             host: "smtp.gmail.com",
             port: 465,
             secure: true,
-            // requireTLS: true,
             auth: {
                 user: process.env.EMAIL_NODEMAILER,
-                pass: process.env.GOOGLE_APP_PASSWORD
-
+                pass: process.env.GOOGLE_APP_PASSWORD.replace(/\s+/g, '') // remove any spaces in app password
             }
-
-        })
-
-        console.log(process.env.EMAIL_NODEMAILER);
-        console.log(process.env.GOOGLE_APP_PASSWORD ? "Password exists" : "No password");
-
+        });
 
         const mailOption = {
-            from: process.env.EMAIL_NODEMAILER,
+            from: `Furmicon <${process.env.EMAIL_NODEMAILER}>`,
             to: email,
-            subject: 'For verfication mail ',
+            subject: 'Furmicon - Email Verification OTP',
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2>Furmicon Email Verification</h2>
+                    <p>Hello <strong>${name}</strong>,</p>
+                    <p>Your One-Time Password (OTP) for verifying your account is:</p>
+                    <h1 style="color: #2b74e2; letter-spacing: 4px;">${otpgener}</h1>
+                    <p>This OTP is valid for 60 seconds.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                </div>
+            `
+        };
 
-            // html:'<p>Hii '+name+', please check here to <a href="http://127.0.0.1:3000/verify?id='+user_id+'">Verify</a> your mail.</p>' 
-            html: '<p>Hii ' + name + ' Otp =' + otpgener + '</p>'
-
-
-
-        }
-
-        transporter.sendMail(mailOption, function (error, info) {
-            if (error) {
-                console.log(error)
-            } else {
-
-                console.log("mail has been sent:- ", info.response);
-
-            }
-        })
-
-
+        const info = await transporter.sendMail(mailOption);
+        console.log("Mail sent successfully:", info.response);
+        return true;
 
     } catch (error) {
-        console.log(error)
+        console.error("Error sending verification email:", error.message);
+        return false;
     }
 }
 
 const insertUser = async (req, res) => {
     try {
+        const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+        const is_already = await User.findOne({ email: email });
 
-        // console.log(req.body.username+"it is user name")
+        if (is_already && is_already.is_verified) {
+            return res.render("user/signUp", { message: "This email is already registered. Please log in." });
+        }
 
+        const spassword = await securePassword(req.body.password);
+        let userdata;
 
-        const is_already = await User.findOne({ email: req.body.email })
-
-        if (is_already && is_already.email === req.body.email && is_already.is_verified) {
-
-            res.render("user/signUp", { message: "This email is already registered. Please log in or reset your password if needed." })
-
+        if (is_already && !is_already.is_verified) {
+            is_already.username = req.body.name;
+            is_already.mobile = req.body.mobile;
+            is_already.password = spassword;
+            userdata = await is_already.save();
         } else {
-
-
-            const spassword = await securePassword(req.body.password);
-            console.log(spassword);
-            // const confirm = await bcrypt.compare(req.body.confirmpassword, spassword)
-            // if (confirm) {
-
-
-
-
             const user = new User({
-
                 username: req.body.name,
-                email: req.body.email,
+                email: email,
                 mobile: req.body.mobile,
                 password: spassword,
                 is_admin: 0,
+                is_verified: 0
+            });
+            userdata = await user.save();
+        }
 
+        if (userdata) {
+            const otpGenerate = generateOTP();
+            req.session.otp = otpGenerate;
+            req.session.email = email;
 
+            await saveOtp(email, otpGenerate);
+            await sendVerifyMail(req.body.name, email, userdata._id, otpGenerate);
 
-            })
-
-
-            const userdata = await user.save();
-            if (userdata) {
-
-                const otpGenerate = generateOTP();
-
-                req.session.otp = otpGenerate
-
-                saveOtp(req.body.email, otpGenerate)
-                req.session.email = req.body.email
-
-
-                sendVerifyMail(req.body.name, req.body.email, userdata._id, otpGenerate)
-
-                res.render('user/otp.ejs')
-                //     res.render('user/home')
-                // }else{
-                //     res.render('user/login', {message:'Failed'})
-                // }
-
-            }
-
-
-            // } else {
-            //     res.render('user/login', { confirm: 'Confirm Password Incorrect' });
-            // }    
-
+            return res.render('user/otp.ejs');
+        } else {
+            return res.render('user/signUp', { message: 'Failed to create user. Please try again.' });
         }
 
     } catch (error) {
-        console.log(error)
+        console.error("Error in insertUser:", error);
+        return res.render('user/signUp', { message: 'An error occurred during registration.' });
     }
 }
+
+
+
+
 
 const verifiedLogin = async (req, res) => {
     try {
@@ -396,59 +368,45 @@ const loadRegister = async (req, res) => {
 
 const verifyMail = async (req, res) => {
     try {
+        const email = req.session.email;
+        if (!email) {
+            return res.render('user/otp', { message: 'Session expired. Please sign up again.' });
+        }
 
-        console.log("it is verify mail " + req.body.otp);
+        const enteredOtp = req.body.otp ? req.body.otp.trim() : '';
+        const otpverify = await OTP.findOne({ email: email.toLowerCase() });
 
-
-        const otpverify = await OTP.findOne({ email: req.session.email });
-
-        // console.log("it is second" + otpverify.otp);
-        // console.log("it is third" + req.body.otp);
         if (otpverify != null) {
+            if (otpverify.otp === enteredOtp) {
+                await User.updateOne({ email: email.toLowerCase() }, { $set: { is_verified: 1 } });
+                await OTP.deleteMany({ email: email.toLowerCase() }); // Delete OTP after successful verification
 
-            if (otpverify.otp == req.body.otp) {
-                const updateInfo = await User.updateOne({ email: req.session.email }, { $set: { is_verified: 1 } })
-                if (updateInfo) {
+                const userData = await User.findOne({ email: email.toLowerCase() });
 
-                    const userData = await User.findOne({ email: req.session.email })
-                    console.log(userData._id, 'it is data')
-
-                    //CREATING WALLET
-                    let createWallet = new Wallet({
-                        balance: 0,
-                        userId: userData._id,
-                    })
-                    await createWallet.save()
-
-
-                    //user has to login for enter to home  page
-                    res.render('user/login.ejs', { afterOtp: 'Please Login' })
+                // Create Wallet if missing
+                if (userData) {
+                    const existingWallet = await Wallet.findOne({ userId: userData._id });
+                    if (!existingWallet) {
+                        const createWallet = new Wallet({
+                            balance: 0,
+                            userId: userData._id,
+                        });
+                        await createWallet.save();
+                    }
                 }
-            } else {
-                const message = "Invalid otp, please check"
-                res.render('user/otp', { message })
 
+                return res.render('user/login.ejs', { afterOtp: 'Email verified successfully. Please login.' });
+            } else {
+                return res.render('user/otp', { message: 'Invalid OTP. Please check and try again.' });
             }
 
         } else {
-            console.log("here is reached")
-            const expires = 'In valid otp, please check'
-            res.render('user/otp', { expires })
+            return res.render('user/otp', { expires: 'OTP has expired or is invalid. Please click Resend OTP.' });
         }
 
-        // console.log(req.session.user_id)
-
-        // console.log(updateInfo);
-        // if(req.body.otp===)
-        // console.log("it is otp form db" + req.body.email)
-
-        // const savedotp = saveOtp()
-
-
-
-
     } catch (error) {
-        console.log(`it is verify mail error${error}`);
+        console.error("Error in verifyMail:", error);
+        return res.render('user/otp', { message: 'An error occurred during verification.' });
     }
 }
 

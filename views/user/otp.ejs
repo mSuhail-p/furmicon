@@ -4,164 +4,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>OTP Page</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <title>Furmicon | Verify OTP</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85)), url(/assets/images/backgrounds/old.jpg);
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 30px 20px;
+    }
+
+    .otp-container {
+      max-width: 440px;
+      width: 100%;
+      padding: 40px 30px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .brand-header h2 {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 5px;
+    }
+
+    .brand-header p {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .otp-input {
+      font-size: 1.6rem;
+      letter-spacing: 12px;
+      text-align: center;
+      font-weight: 700;
+      color: #1e293b;
+      height: 55px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      transition: all 0.3s ease;
+    }
+
+    .otp-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .timer-badge {
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .btn-submit {
+      height: 48px;
+      border-radius: 10px;
+      background: #2563eb;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .btn-resend {
+      height: 42px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h4 class="text-center">Enter OTP</h4>
-          </div>
-          <div class="card-body">
-            <form action="/verify" method="post">
-              <div class="form-group">
-                <label for="otpInput">OTP:</label>
-                <input type="text" class="form-control" name="otp" id="otpInput" maxlength="4" required>
-              </div>
-              <div class="form-group">
-                <p id="timer">Time remaining: <span id="countdown">60</span> seconds</p>
-              </div>
-              <div class="form-group">
-                <button type="button" class="btn btn-primary" id="resendBtn" onclick="combinfunction()" disabled>Resend
-                  OTP</button>
-              </div>
-              <button type="submit" class="btn btn-success btn-block">Verify OTP</button>
+  <div class="otp-container">
+    <div class="brand-header">
+      <h2>Verify OTP</h2>
+      <p>Please enter the 4-digit code sent to your registered email</p>
+    </div>
 
+    <form action="/verify" method="post" id="otpForm">
+      <div class="form-group mb-4">
+        <input type="text" class="form-control otp-input" name="otp" id="otpInput" maxlength="4" placeholder="••••" required autofocus autocomplete="off">
+      </div>
 
-
-            </form>
-          </div>
+      <div class="text-center mb-4">
+        <div class="timer-badge" id="timer">
+          Time remaining: <span id="countdown" class="font-weight-bold text-primary">60</span>s
         </div>
       </div>
-    </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-submit mb-3">Verify Code</button>
+
+      <div class="text-center">
+        <button type="button" class="btn btn-outline-secondary btn-block btn-resend" id="resendBtn" onclick="resendOTP()" disabled>
+          <i class="fas fa-redo-alt mr-1"></i> Resend OTP
+        </button>
+      </div>
+    </form>
   </div>
 
+  <% if (typeof message != 'undefined' && message) { %>
+    <script>
+      Swal.fire({
+        title: 'Verification Notice',
+        text: '<%= message %>',
+        icon: 'error',
+        confirmButtonColor: '#2563eb'
+      });
+    </script>
+  <% } %>
 
-  <% if (typeof message!='undefined' ) { %>
-    <div>
-      <script>
-        // Show a basic SweetAlert2 message
+  <% if (typeof expires != 'undefined' && expires) { %>
+    <script>
+      Swal.fire({
+        title: 'OTP Expired',
+        text: '<%= expires %>',
+        icon: 'warning',
+        confirmButtonColor: '#2563eb'
+      });
+    </script>
+  <% } %>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    let timer;
+
+    function startTimer() {
+      clearInterval(timer);
+      let countdown = 60;
+      const timerElem = document.getElementById('timer');
+      const resendBtn = document.getElementById('resendBtn');
+      
+      if (timerElem) {
+        timerElem.innerHTML = "Time remaining: <span id='countdown' class='font-weight-bold text-primary'>60</span>s";
+      }
+      if (resendBtn) resendBtn.disabled = true;
+
+      timer = setInterval(function () {
+        countdown--;
+        const cdElem = document.getElementById('countdown');
+        if (cdElem) cdElem.innerText = countdown;
+
+        if (countdown <= 0) {
+          clearInterval(timer);
+          if (timerElem) timerElem.innerHTML = "<span class='text-danger font-weight-bold'>OTP Expired. Please request a new code.</span>";
+          if (resendBtn) resendBtn.disabled = false;
+        }
+      }, 1000);
+    }
+    
+    startTimer();
+
+    function resendOTP() {
+      const resendBtn = document.getElementById('resendBtn');
+      resendBtn.disabled = true;
+
+      fetch('/resend', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            title: 'Success',
+            text: data.message || 'A new OTP has been sent to your email.',
+            icon: 'success',
+            timer: 2500,
+            showConfirmButton: false
+          });
+          startTimer();
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: data.message || 'Failed to resend OTP.',
+            icon: 'error',
+            confirmButtonColor: '#2563eb'
+          });
+          resendBtn.disabled = false;
+        }
+      })
+      .catch(error => {
+        console.error('Resend OTP error:', error);
         Swal.fire({
-          title: 'Invalid otp',
+          title: 'Error',
+          text: 'Network error while resending OTP. Please try again.',
           icon: 'error',
-          confirmButtonText: 'Yes',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // User clicked confirm button
-            combinfunction()// Function call after the SweetAlert dialog is closed
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            // User clicked cancel button or closed the dialog using the overlay
-            // No action needed
-          }
+          confirmButtonColor: '#2563eb'
         });
-      </script>
-    </div>
-    <% } %>
-
-      <% if (typeof expires!='undefined' ) { %>
-        <div>
-          <script>
-            Swal.fire({
-              title: 'Invalid otp',
-              icon: 'error',
-              confirmButtonText: 'Yes',
-              reverseButtons: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // User clicked confirm button
-                combinfunction() // Function call after the SweetAlert dialog is closed
-              } else if (result.dismiss === Swal.DismissReason.cancel) {
-                // User clicked cancel button or closed the dialog using the overlay
-                // No action needed
-              }
-            });
-          </script>
-        </div>
-        <% } %>
-
-
-
-
-
-
-          <!-- Bootstrap JS and jQuery -->
-
-          <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-          <!-- Timer script -->
-          <script>
-            var countdown = 60;
-            // var timer = null;
-
-            let timer; // Declare the timer variable outside the function
-
-            function startTimer() {
-              // Clear any existing interval
-              clearInterval(timer);
-
-              let countdown = 60; // Set the countdown to 60 seconds (or any desired value)
-
-              timer = setInterval(function () {
-                countdown--;
-                document.getElementById('countdown').innerHTML = countdown;
-                if (countdown <= 0) {
-                  clearInterval(timer);
-                  document.getElementById('timer').innerHTML = "Time expired. Resend OTP.";
-                  document.getElementById('resendBtn').disabled = false; // Enable the resend button
-                }
-              }, 1000); // Repeat every 1000 milliseconds (1 second)
-            }
-            startTimer();
-
-            function combinfunction() {
-              resendOTP();
-              sendPostRequest();
-            }
-
-            function resendOTP() {
-              // Add logic to resend OTP, for now, reset the timer
-              countdown = 60;
-              document.getElementById('timer').innerHTML = "OTP resent. Time remaining: <span id='countdown'>60</span> seconds";
-              startTimer();
-              document.getElementById('resendBtn').disabled = true; // Disable the resend button again
-            }
-
-            function sendPostRequest() {
-              const url = '/resend'; // Replace with your actual backend endpoint
-
-              fetch(url, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-              })
-                .then(response => {
-                  if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  console.log('Response:', data);
-                  // Handle the response as needed
-                })
-                .catch(error => {
-                  console.error('Error:', error.message);
-                });
-            }
-          </script>
-
-
+        resendBtn.disabled = false;
+      });
+    }
+  </script>
 </body>
 
 </html>
